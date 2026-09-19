@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VALKYRIE-OS // 生体鍛錬＆セルフケア ゲームマスター</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts: Orbitron, Chakra Petch, Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700;900&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              black: '#04060a',
+              dark: '#080d1a',
+              card: '#0c1424',
+              border: '#1b2a47',
+              cyan: '#00f0ff',
+              gold: '#ffd700',
+              amber: '#f59e0b',
+              purple: '#a855f7',
+              red: '#ff0055',
+              green: '#10b981'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans JP"', 'sans-serif'],
+            mono: ['"Chakra Petch"', 'monospace'],
+            display: ['"Orbitron"', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #04060a;
+      color: #e2e8f0;
+      font-family: 'Noto Sans JP', sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.09) 0%, transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.06) 0%, transparent 45%),
+        linear-gradient(rgba(8, 13, 26, 0.96), rgba(4, 6, 10, 0.98)),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.015) 2px, rgba(0, 240, 255, 0.015) 4px);
+    }
+    
+    .cyber-panel {
+      background: rgba(12, 20, 36, 0.88);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(0, 240, 255, 0.22);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65), inset 0 0 15px rgba(0, 240, 255, 0.03);
+    }
+
+    .cyber-panel-gold {
+      background: rgba(28, 20, 8, 0.92);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 215, 0, 0.45);
+      box-shadow: 0 4px 25px rgba(255, 215, 0, 0.18), inset 0 0 18px rgba(255, 215, 0, 0.08);
+    }
+
+    .cyber-btn {
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      clip-path: polygon(7px 0%, 100% 0%, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0% 100%, 0% 7px);
+    }
+
+    .cyber-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.15);
+    }
+
+    .cyber-btn:active {
+      transform: translateY(0);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080d1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1b2a47;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+  <header class="sticky top-0 z-40 bg-slate-950/90 border-b border-cyan-500/30 backdrop-blur-md px-3 sm:px-6 py-2.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand & Player Identity -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-cyan-950/80 border border-cyan-400 flex items-center justify-center text-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.4)]">
+          <i class="fa-solid fa-brain text-lg animate-pulse"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-black text-sm sm:text-base tracking-wider text-cyan-400">VALKYRIE-OS</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono">生体防衛 JST</span>
+          </div>
+          <div class="text-xs text-slate-400 flex items-center gap-2 font-mono">
+            <span class="text-slate-200 font-bold" id="header-player-name">CHALLENGER</span>
+            <span class="text-cyan-400 font-semibold" id="header-player-level">Lv.3.5</span>
+            <span class="text-amber-400 font-bold">🔥 <span id="header-player-streak">5</span>日連続</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Telemetry & Tool Buttons -->
+      <div class="flex items-center flex-wrap gap-2 sm:gap-3 text-xs">
+        
+        <!-- JST 24:00 Countdown -->
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-700/60 font-mono text-[11px] text-slate-300" title="日本時間24:00に日次リフレッシュ">
+          <i class="fa-regular fa-clock text-cyan-400"></i>
+          <span>24時更新まで:</span>
+          <span class="text-amber-400 font-bold" id="header-jst-countdown">--:--:--</span>
+        </div>
+
+        <!-- JIKOKANRI Link Button -->
+        <a href="https://gaktotakamori-sys.github.io/JIKOKANRI/" target="_blank" rel="noopener noreferrer" 
+           class="cyber-btn px-3 py-1.5 bg-purple-950/80 border border-purple-400/80 text-purple-200 hover:text-white flex items-center gap-1.5 text-xs font-semibold shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+          <i class="fa-solid fa-link text-purple-400"></i>
+          <span>自己管理アプリ</span>
+        </a>
+
+        <!-- Sortie Recommendation Briefing Button -->
+        <button onclick="openSortieBriefingModal()" class="cyber-btn px-3 py-1.5 bg-amber-950/80 border border-amber-400 text-amber-300 hover:text-white flex items-center gap-1.5 text-xs font-semibold shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+          <i class="fa-solid fa-crosshairs text-amber-400"></i>
+          <span>出撃推奨</span>
+        </button>
+
+        <!-- Generate iPhone 9:16 HUD Button -->
+        <button onclick="generateSciFiHudImage()" class="cyber-btn px-3 py-1.5 bg-cyan-950/90 border border-cyan-400 text-cyan-300 hover:text-white flex items-center gap-1.5 text-xs font-semibold shadow-[0_0_12px_rgba(0,240,255,0.4)]">
+          <i class="fa-solid fa-mobile-screen text-cyan-400"></i>
+          <span>HUD画像 (9:16)</span>
+        </button>
+
+        <!-- Backup & Download Menu Button -->
+        <button onclick="openBackupModal()" class="cyber-btn px-2.5 py-1.5 bg-slate-900 border border-slate-700 text-slate-300 hover:text-cyan-400 text-xs" title="データバックアップ・引継ぎ">
+          <i class="fa-solid fa-database"></i>
+        </button>
+
+        <!-- Cyber Sound Effect Toggle -->
+        <button id="sound-toggle-btn" onclick="toggleCyberSound()" class="cyber-btn px-2.5 py-1.5 bg-slate-900 border border-slate-700 text-slate-400 hover:text-cyan-400 text-xs" title="効果音切替">
+          <i class="fa-solid fa-volume-xmark" id="sound-icon"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 flex-1 flex flex-col gap-4">
+    
+    <!-- Top Alert Banner: Decay Warning (3h before stage 2) -->
+    <div id="decay-warning-banner" class="hidden p-3 rounded-lg bg-red-950/80 border border-red-500/80 shadow-[0_0_20px_rgba(255,0,85,0.3)] flex items-center justify-between gap-3 text-red-200">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-red-900/80 border border-red-400 flex items-center justify-center text-red-300 animate-bounce">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <div class="font-bold text-xs sm:text-sm text-red-100 font-mono tracking-wide" id="decay-warning-title">⚠️【ロスト阻止アラート】ステータス大幅減衰の危機！</div>
+          <div class="text-xs text-red-300" id="decay-warning-desc">--</div>
+        </div>
+      </div>
+      <button onclick="handleEmergencySortie()" class="cyber-btn px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs shrink-0">
+        直ちに出撃
+      </button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-2 overflow-x-auto gap-2">
+      <div class="flex items-center gap-1 sm:gap-2">
+        <button onclick="switchMainTab('training')" id="tab-btn-training" class="px-3.5 py-2 rounded-t-lg font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-300 bg-cyan-950/40">
+          <i class="fa-solid fa-dumbbell"></i>
+          <span>鍛錬作戦基地</span>
+        </button>
+        <button onclick="switchMainTab('nutrition')" id="tab-btn-nutrition" class="px-3.5 py-2 rounded-t-lg font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-utensils"></i>
+          <span>生化学・食事＆水分</span>
+        </button>
+        <button onclick="switchMainTab('biometrics')" id="tab-btn-biometrics" class="px-3.5 py-2 rounded-t-lg font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>生体分析・身体配当録</span>
+        </button>
+        <button onclick="switchMainTab('comms')" id="tab-btn-comms" class="px-3.5 py-2 rounded-t-lg font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-satellite-dish"></i>
+          <span>作戦通信端末</span>
+        </button>
+      </div>
+
+      <!-- Sort Toggle Controls -->
+      <div class="flex items-center gap-2 shrink-0 text-xs text-slate-400" id="training-sort-controls">
+        <span class="hidden md:inline font-mono">並び順:</span>
+        <button onclick="toggleSortMode()" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-700 text-slate-300 hover:text-cyan-400 flex items-center gap-1 font-mono">
+          <i class="fa-solid fa-arrow-down-short-wide text-cyan-400"></i>
+          <span id="sort-mode-label">緊急度・優先順</span>
+        </button>
+      </div>
+    </div>
+
+    <section id="tab-content-training" class="space-y-4">
+      
+      <!-- Top Overview Status Bar -->
+      <div class="cyber-panel rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="text-center border-r border-slate-700 pr-4">
+            <div class="text-[10px] text-slate-400 font-mono uppercase tracking-wider">プレイヤーLv</div>
+            <div class="text-xl sm:text-2xl font-black font-display text-cyan-400" id="summary-player-level">Lv.3.5</div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-300 font-semibold flex items-center gap-2">
+              <span>総合生体EXP:</span>
+              <span class="text-cyan-300 font-mono font-bold" id="summary-total-exp">210.0 / 600</span>
+              <span class="text-[11px] text-amber-400 font-mono">(次回Lv.4.0まで あと30.0)</span>
+            </div>
+            <div class="w-48 sm:w-64 h-2 bg-slate-800 rounded-full mt-1.5 overflow-hidden border border-slate-700">
+              <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500" id="summary-exp-bar" style="width: 35%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs font-mono">
+          <div class="px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+            <span>維持シールド: <strong id="summary-shield-status">OVERDRIVE (96h維持)</strong></span>
+          </div>
+          <div class="px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>同調率: <strong id="summary-sync-rate">88%</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Cards Grid (Sorted Dynamically) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="training-cards-container">
+        <!-- Injected via renderTrainingCards() -->
+      </div>
+    </section>
+
+    <section id="tab-content-nutrition" class="hidden space-y-4">
+      
+      <!-- Hydration Telemetry -->
+      <div class="cyber-panel rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-950/80 border border-blue-400 flex items-center justify-center text-blue-400 text-xl shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+            <i class="fa-solid fa-droplet animate-pulse"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-sm text-slate-100">水分＆電解質テレメトリー (JST日次)</h3>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-500/40 font-mono">Patch 2.1 稼働中</span>
+            </div>
+            <div class="text-xs text-slate-400 mt-0.5">
+              本日給水量: <span class="text-cyan-400 font-bold font-mono text-base" id="water-current-display">1450</span> ml / 目標 2000 ml
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Water Intake Buttons -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="addWaterIntake(150, '常温水 150ml')" class="cyber-btn px-2.5 py-1.5 rounded bg-blue-950/60 border border-blue-500/40 text-blue-300 hover:text-white text-xs">
+            +150ml
+          </button>
+          <button onclick="addWaterIntake(200, '常温水 200ml')" class="cyber-btn px-2.5 py-1.5 rounded bg-blue-950/60 border border-blue-500/40 text-blue-300 hover:text-white text-xs">
+            +200ml
+          </button>
+          <button onclick="addWaterIntake(250, '常温水 250ml')" class="cyber-btn px-2.5 py-1.5 rounded bg-blue-950/60 border border-blue-500/40 text-blue-300 hover:text-white text-xs">
+            +250ml
+          </button>
+          <button onclick="addWaterIntake(100, 'ポカリスエット 1口(電解質)')" class="cyber-btn px-2.5 py-1.5 rounded bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs">
+            +電解質
+          </button>
+        </div>
+      </div>
+
+      <!-- Meal Reporting & Preset Suite -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        
+        <!-- Left: Meal Submission Console -->
+        <div class="lg:col-span-2 cyber-panel rounded-xl p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-dna text-cyan-400"></i>
+              <h3 class="font-bold text-sm text-slate-100">生化学・食事査定コンソール</h3>
+            </div>
+            <button onclick="openPresetEditorModal()" class="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-mono">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>プリセット追加・編集</span>
+            </button>
+          </div>
+
+          <!-- Quick Preset Cards -->
+          <div>
+            <div class="text-xs text-slate-400 mb-2 font-mono">定番プリセット（ワンクリック展開）:</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="preset-cards-container">
+              <!-- Injected via renderMealPresets() -->
+            </div>
+          </div>
+
+          <!-- Food Part Chips -->
+          <div>
+            <div class="text-xs text-slate-400 mb-2 font-mono flex items-center justify-between">
+              <span>単品パーツ（タップで追加）:</span>
+              <span class="text-[10px] text-slate-500">マイ・フードライブラリより</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5" id="food-chips-container">
+              <!-- Injected via renderFoodChips() -->
+            </div>
+          </div>
+
+          <!-- Photo / Camera Attachment Action Suite -->
+          <div class="space-y-2 pt-1 border-t border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-slate-400 font-mono flex items-center gap-1.5">
+                <i class="fa-solid fa-camera text-cyan-400"></i>
+                <span>食事写真・画像スキャン（写真・カメラ・ファイル）:</span>
+              </span>
+              <span class="text-[10px] text-cyan-400 font-mono" id="photo-status-badge">未添付</span>
+            </div>
+
+            <!-- 3-Button Action Suite (Photo / Camera / File) -->
+            <div class="grid grid-cols-3 gap-2">
+              <!-- Photo Album -->
+              <input type="file" id="meal-photo-album-input" accept="image/*" class="hidden" onchange="handleMealPhotoSelected(event)">
+              <button type="button" onclick="document.getElementById('meal-photo-album-input').click()" 
+                      class="cyber-btn py-2 px-2 bg-slate-900/90 border border-slate-700/80 hover:border-cyan-400/80 rounded-xl flex flex-col items-center justify-center gap-1 group transition">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 group-hover:text-cyan-300 group-hover:bg-cyan-950/60 transition">
+                  <i class="fa-regular fa-image text-sm"></i>
+                </div>
+                <span class="text-[11px] font-bold text-slate-300 group-hover:text-white">写真</span>
+              </button>
+
+              <!-- Camera Capture -->
+              <input type="file" id="meal-photo-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleMealPhotoSelected(event)">
+              <button type="button" onclick="document.getElementById('meal-photo-camera-input').click()" 
+                      class="cyber-btn py-2 px-2 bg-slate-900/90 border border-slate-700/80 hover:border-amber-400/80 rounded-xl flex flex-col items-center justify-center gap-1 group transition">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 group-hover:text-amber-300 group-hover:bg-amber-950/60 transition">
+                  <i class="fa-solid fa-camera text-sm"></i>
+                </div>
+                <span class="text-[11px] font-bold text-slate-300 group-hover:text-white">カメラ</span>
+              </button>
+
+              <!-- File Browser -->
+              <input type="file" id="meal-photo-file-input" accept="image/*" class="hidden" onchange="handleMealPhotoSelected(event)">
+              <button type="button" onclick="document.getElementById('meal-photo-file-input').click()" 
+                      class="cyber-btn py-2 px-2 bg-slate-900/90 border border-slate-700/80 hover:border-purple-400/80 rounded-xl flex flex-col items-center justify-center gap-1 group transition">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 group-hover:text-purple-300 group-hover:bg-purple-950/60 transition">
+                  <i class="fa-solid fa-paperclip text-sm"></i>
+                </div>
+                <span class="text-[11px] font-bold text-slate-300 group-hover:text-white">ファイル</span>
+              </button>
+            </div>
+
+            <!-- Attached Image Preview Container -->
+            <div id="meal-photo-preview-container" class="hidden p-2 rounded-lg bg-slate-950/80 border border-cyan-500/40 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5 overflow-hidden">
+                <img id="meal-photo-preview-img" src="" alt="食事プレビュー" class="w-12 h-12 rounded-md object-cover border border-slate-700 shrink-0">
+                <div class="overflow-hidden">
+                  <div class="text-xs font-bold text-cyan-300 truncate" id="meal-photo-filename">photo.jpg</div>
+                  <div class="text-[10px] text-slate-400 font-mono">生化学AIビジョンスキャン準備完了</div>
+                </div>
+              </div>
+              <button type="button" onclick="removeMealPhoto()" class="cyber-btn px-2.5 py-1 bg-red-950/70 border border-red-500/40 text-red-300 hover:text-white text-[11px] shrink-0">
+                <i class="fa-solid fa-trash-can mr-1"></i>解除
+              </button>
+            </div>
+          </div>
+
+          <!-- Meal Input Textarea -->
+          <div class="space-y-1.5">
+            <label class="text-xs text-slate-400 font-mono flex items-center justify-between">
+              <span>摂取内容レポート（テキスト補足や食材メモ）:</span>
+              <button onclick="clearMealInput()" class="text-slate-500 hover:text-slate-300 text-[11px]">クリア</button>
+            </label>
+            <textarea id="meal-input-text" rows="3" 
+              placeholder="例：もち麦入り白米0.8杯、イワシ1匹、牛しぐれスプーン2杯、アマゾネスWPCプロテイン15g、常温水200ml（写真のみでも査定可能）"
+              class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-cyan-400 transition font-sans"></textarea>
+          </div>
+
+          <!-- Action Controls -->
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <input type="checkbox" id="anabolic-window-check" class="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-0">
+              <label for="anabolic-window-check" class="cursor-pointer select-none">
+                鍛錬後120分以内（アナボリック・ウィンドウ）
+              </label>
+            </div>
+            <button id="submit-meal-btn" onclick="submitMealAssessment()" class="cyber-btn px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs sm:text-sm shadow-[0_0_15px_rgba(0,240,255,0.4)] flex items-center gap-2">
+              <i class="fa-solid fa-microscope" id="submit-meal-icon"></i>
+              <span id="submit-meal-btn-text">生化学査定を実行</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Assessment Feedback Result -->
+        <div id="meal-feedback-panel" class="cyber-panel rounded-xl p-4 flex flex-col justify-between gap-3 transition-all duration-300">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-check text-amber-400"></i>
+                <div>
+                  <h3 class="font-bold text-sm text-slate-100">最新の生化学査定フィードバック</h3>
+                  <div class="text-[10px] text-slate-400 font-mono">査定時刻: <span id="meal-feedback-timestamp" class="text-cyan-400 font-bold">12:30:15 JST</span></div>
+                </div>
+              </div>
+              <span class="font-display font-black text-amber-400 text-2xl tracking-wider px-2 py-0.5 rounded bg-amber-950/60 border border-amber-500/40" id="latest-meal-rank-badge">RANK S</span>
+            </div>
+
+            <!-- Dynamic Feedback Box -->
+            <div class="mt-3 space-y-2 text-xs" id="latest-meal-feedback-box">
+              <div class="p-2.5 rounded bg-slate-950/70 border border-slate-800 text-slate-300">
+                <div class="text-[11px] font-bold text-cyan-400 mb-1 flex items-center justify-between">
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-medal"></i> オペレーターより賛辞</span>
+                  <span class="text-[10px] font-mono text-cyan-300/80" id="feedback-compliment-tag">栄養密度適合</span>
+                </div>
+                <p id="meal-feedback-compliment" class="leading-relaxed">素晴らしい栄養補給です！完全栄養食とWPCプロテインによるアミノ酸プール供給が完璧に整っています。</p>
+              </div>
+
+              <div class="p-2.5 rounded bg-slate-950/70 border border-slate-800 text-slate-300">
+                <div class="text-[11px] font-bold text-amber-400 mb-1 flex items-center justify-between">
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-dna"></i> 生化学メカニズム</span>
+                  <span class="text-[10px] font-mono text-amber-300/80">mTORシグナル伝達</span>
+                </div>
+                <p id="meal-feedback-mechanism" class="leading-relaxed">mTORシグナル伝達系が活性化。イワシのオメガ3脂肪酸が細胞膜の柔軟性を高め、微小筋損傷の修復速度を20%ブースト。</p>
+              </div>
+
+              <div class="p-2.5 rounded bg-slate-950/70 border border-slate-800 text-slate-300">
+                <div class="text-[11px] font-bold text-emerald-400 mb-1 flex items-center justify-between">
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles"></i> 神アップグレード案</span>
+                  <span class="text-[10px] font-mono text-emerald-300/80">次回補給推奨</span>
+                </div>
+                <p id="meal-feedback-advice" class="leading-relaxed">次回トレ前30分に日光甚五郎煎餅を1〜2枚投入すると、筋グリコーゲンの初期爆発力がさらに研ぎ澄まされます。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between font-mono">
+            <span>獲得バフ: <strong class="text-cyan-400" id="meal-feedback-exp-buff">+1.5 EXP</strong></span>
+            <span>シールド: <strong class="text-emerald-400" id="meal-feedback-shield-buff">+12h 延長</strong></span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="tab-content-biometrics" class="hidden space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        
+        <!-- Radar Chart Panel -->
+        <div class="cyber-panel rounded-xl p-4 flex flex-col items-center justify-between">
+          <div class="w-full flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-cyan-400"></i>
+              <h3 class="font-bold text-sm text-slate-100">6大筋骨格レーダーチャート</h3>
+            </div>
+            <span class="text-xs font-mono text-cyan-400">全ステータス 30突破済</span>
+          </div>
+
+          <div class="relative my-3 flex items-center justify-center">
+            <canvas id="radar-canvas" width="300" height="280" class="max-w-full"></canvas>
+          </div>
+
+          <div class="w-full text-center text-xs text-slate-400 font-mono">
+            【プレイヤーLv】: <strong class="text-cyan-400">Lv.3.5</strong> / 次回解放 4.0
+          </div>
+        </div>
+
+        <!-- Unlocked Bodily Dividends (8 Items) -->
+        <div class="lg:col-span-2 cyber-panel rounded-xl p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-gem text-amber-400"></i>
+              <h3 class="font-bold text-sm text-slate-100">解禁済み「生活恩恵（身体配当録）」</h3>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/40 font-mono">8件稼働中</span>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono">次回解禁: 各部位45突破 / Lv.4.0</div>
+          </div>
+
+          <!-- Dividends Grid List -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto max-h-[340px] pr-1" id="dividends-container">
+            <!-- Injected via renderDividendsList() -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Missions & Badges Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        
+        <!-- Daily Operations -->
+        <div class="cyber-panel rounded-xl p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-cyan-400"></i>
+              <h3 class="font-bold text-sm text-slate-100">本日の作戦指令（デイリーミッション）</h3>
+            </div>
+            <span class="text-xs text-slate-400 font-mono">日本時間24時更新</span>
+          </div>
+
+          <div class="space-y-2" id="daily-missions-container">
+            <!-- Injected via renderDailyMissions() -->
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="cyber-panel rounded-xl p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-award text-purple-400"></i>
+              <h3 class="font-bold text-sm text-slate-100">名誉称号・アチーブメント</h3>
+            </div>
+            <span class="text-xs text-purple-400 font-mono" id="achievements-unlocked-count">5 / 8 解禁</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="achievements-container">
+            <!-- Injected via renderAchievements() -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="tab-content-comms" class="hidden space-y-4">
+      <div class="cyber-panel rounded-xl p-4 flex flex-col h-[520px]">
+        
+        <!-- Terminal Header -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-cyan-950 border border-cyan-400 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-terminal text-sm"></i>
+            </div>
+            <div>
+              <div class="font-bold text-sm text-slate-100 font-mono">VALKYRIE-OS // オペレーター通信</div>
+              <div class="text-xs text-cyan-400 font-mono flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>オンライン同調中 (同調率: <span id="comms-sync-rate">88%</span>)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="speakLastOperatorMessage()" class="cyber-btn px-2.5 py-1 bg-slate-900 border border-slate-700 text-slate-300 hover:text-cyan-400 text-xs flex items-center gap-1">
+              <i class="fa-solid fa-volume-high"></i>
+              <span>音声読み上げ</span>
+            </button>
+            <button onclick="clearCommsHistory()" class="text-xs text-slate-500 hover:text-slate-300">
+              ログ消去
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Stream -->
+        <div class="flex-1 overflow-y-auto my-3 space-y-3 pr-2 font-mono text-xs sm:text-sm" id="comms-messages-box">
+          <!-- Populated dynamically via appendCommsMessage() -->
+        </div>
+
+        <!-- Input Bar -->
+        <div class="pt-2 border-t border-slate-800 flex items-center gap-2">
+          <input type="text" id="comms-user-input" 
+            placeholder="オペレーターへの報告・質問（例：画像見せて、今からやるなら？、腹筋完了）..." 
+            onkeydown="if(event.key==='Enter') sendCommsMessage()"
+            class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-cyan-400 transition font-sans">
+          
+          <button onclick="sendCommsMessage()" class="cyber-btn px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs shrink-0 flex items-center gap-1.5">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>送信</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 1. Video Playback Modal (With Direct YouTube Launch) -->
+  <div id="video-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6" onclick="if(event.target===this) closeVideoModal()">
+    <div class="cyber-panel rounded-2xl max-w-2xl w-full p-4 sm:p-5 flex flex-col gap-4 border border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.3)]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-play text-cyan-400"></i>
+          <h3 class="font-bold text-base text-slate-100" id="video-modal-title">メニュー名</h3>
+        </div>
+        <button onclick="closeVideoModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Direct YouTube Launch Button -->
+      <a id="video-direct-link" href="#" target="_blank" rel="noopener noreferrer" 
+         class="cyber-btn w-full py-2.5 px-4 bg-red-600 hover:bg-red-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+        <i class="fa-brands fa-youtube text-lg"></i>
+        <span>YouTube公式アプリ／Webで直接再生する（推奨・エラー153回避）</span>
+      </a>
+
+      <!-- Video Embed Frame -->
+      <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+        <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="text-[11px] text-slate-400">
+        ※動画プレーヤーの設定エラー（エラー153）が発生する場合は、上の赤色ボタンからYouTube公式で視聴してください。
+      </div>
+
+      <!-- Workout Action Controls -->
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button onclick="recordWorkoutFromModal(false)" class="cyber-btn px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+          限界まで消化 (80%上昇)
+        </button>
+        <button onclick="recordWorkoutFromModal(true)" class="cyber-btn px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black text-xs font-bold shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+          完遂！ (フル上昇)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. iPhone 9:16 HUD Status Image Modal (With Master Template Management) -->
+  <div id="hud-image-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-2 sm:p-4" onclick="if(event.target===this) closeHudImageModal()">
+    <div class="cyber-panel rounded-2xl max-w-md w-full p-4 flex flex-col gap-3 border border-cyan-400 shadow-[0_0_40px_rgba(0,240,255,0.35)] max-h-[95vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-mobile-screen text-cyan-400"></i>
+          <div>
+            <h3 class="font-bold text-sm text-slate-100">iPhone用 縦長HUDステータス画面 (9:16)</h3>
+            <div class="text-[10px] text-slate-400 font-mono">SNSストーリーズ / X 投稿用フォーマット</div>
+          </div>
+        </div>
+        <button onclick="closeHudImageModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Master Template Bar -->
+      <div class="p-2.5 rounded-xl bg-slate-900/95 border border-cyan-500/40 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-500" id="master-template-status-dot"></span>
+          <div>
+            <div class="text-[10px] text-slate-400 font-mono">お手本マスター状態:</div>
+            <div class="font-bold text-slate-200" id="master-template-status-label">標準プロシージャル描画</div>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-1.5">
+          <input type="file" id="master-template-file-input" accept="image/*" class="hidden" onchange="handleMasterTemplateUpload(event)">
+          
+          <button onclick="document.getElementById('master-template-file-input').click()" 
+                  class="cyber-btn px-2.5 py-1.5 bg-cyan-950 border border-cyan-400 text-cyan-300 hover:text-white flex items-center gap-1 text-[11px] font-semibold"
+                  title="お手本画像ファイル（PNG/JPG）を取り込んでマスターに設定">
+            <i class="fa-solid fa-file-import"></i>
+            <span>お手本画像を登録</span>
+          </button>
+          
+          <button onclick="saveCurrentAsMasterTemplate()" id="save-current-master-btn"
+                  class="cyber-btn px-2.5 py-1.5 bg-amber-950 border border-amber-400 text-amber-300 hover:text-white flex items-center gap-1 text-[11px] font-semibold"
+                  title="現在画面に表示されている画像を新たなお手本として保存">
+            <i class="fa-solid fa-star"></i>
+            <span>これをお手本に保存</span>
+          </button>
+
+          <button onclick="resetMasterTemplate()" id="reset-master-btn"
+                  class="hidden cyber-btn px-2 py-1.5 bg-slate-800 border border-slate-700 text-slate-400 hover:text-red-400 text-[11px]"
+                  title="お手本を解除して標準描画に戻す">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Image Canvas Container -->
+      <div id="hud-image-container" class="w-full flex items-center justify-center bg-slate-950 rounded-xl overflow-hidden border border-slate-800 relative min-h-[420px]">
+        <!-- Injected via generateSciFiHudImage() -->
+      </div>
+
+      <!-- Footer Action Controls -->
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800">
+        <button onclick="downloadCurrentHudImage()" class="cyber-btn px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-download"></i>
+          <span>画像を保存</span>
+        </button>
+
+        <button onclick="requestAiEnhancedHudImage()" class="cyber-btn px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-bold flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.4)]">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Gemini AI画像再生成</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Sortie Briefing Modal -->
+  <div id="sortie-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4" onclick="if(event.target===this) closeSortieModal()">
+    <div class="cyber-panel rounded-2xl max-w-md w-full p-5 flex flex-col gap-4 border border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.3)]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-crosshairs text-amber-400"></i>
+          <h3 class="font-bold text-base text-slate-100 font-mono">作戦司令部 // 出撃推奨ブリーフィング</h3>
+        </div>
+        <button onclick="closeSortieModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 space-y-2">
+        <div class="text-xs text-amber-300 font-mono font-bold uppercase tracking-wider flex items-center justify-between">
+          <span>推奨ターゲット部位</span>
+          <span id="sortie-urgency-badge" class="px-2 py-0.5 rounded bg-amber-900 text-amber-200 text-[10px]">最優先</span>
+        </div>
+        <div class="text-xl font-black text-slate-100 flex items-center gap-2" id="sortie-target-title">
+          【下半身】大腿・代謝
+        </div>
+        <p class="text-xs text-slate-300" id="sortie-target-reason">
+          前回実施から時間が経過し、全身代謝シグナルの維持期限が迫っています。今消化することで超回復の果実を最大化できます。
+        </p>
+      </div>
+
+      <div class="space-y-1.5 text-xs font-mono text-slate-300">
+        <div class="flex justify-between py-1 border-b border-slate-800">
+          <span>現在のステータス:</span>
+          <span class="text-cyan-400 font-bold" id="sortie-current-stat">42.5 / 100</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-800">
+          <span>獲得見込みEXP:</span>
+          <span class="text-amber-400 font-bold">+4.0 〜 +5.0 EXP</span>
+        </div>
+        <div class="flex justify-between py-1">
+          <span>維持シールド効果:</span>
+          <span class="text-emerald-400 font-bold">+72h 超回復フェーズ突入</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button onclick="closeSortieModal()" class="cyber-btn px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
+          後で
+        </button>
+        <button onclick="launchTargetSortie()" class="cyber-btn px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-bold shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center gap-1.5">
+          <i class="fa-solid fa-play"></i>
+          <span>直ちに出撃（動画を開く）</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Celebration Modal (身体配当解禁・ミッション達成) -->
+  <div id="celebration-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4" onclick="if(event.target===this) closeCelebrationModal()">
+    <div class="cyber-panel-gold rounded-2xl max-w-md w-full p-6 flex flex-col items-center text-center gap-4 border border-amber-400 shadow-[0_0_50px_rgba(255,215,0,0.4)]">
+      <div class="w-16 h-16 rounded-2xl bg-amber-950 border-2 border-amber-400 flex items-center justify-center text-amber-400 text-3xl shadow-[0_0_25px_rgba(255,215,0,0.6)] animate-bounce">
+        <i class="fa-solid fa-crown" id="celebration-icon"></i>
+      </div>
+
+      <div>
+        <div class="text-xs font-mono font-bold text-amber-400 tracking-widest uppercase mb-1" id="celebration-badge">
+          ✦ 生活恩恵（身体配当）授与 ✦
+        </div>
+        <h3 class="text-xl font-black text-slate-100 font-display" id="celebration-title">
+          新たな身体配当の解禁
+        </h3>
+      </div>
+
+      <div class="p-4 rounded-xl bg-amber-950/60 border border-amber-500/40 text-left w-full space-y-2">
+        <div class="text-sm font-bold text-amber-200" id="celebration-subtitle">
+          ［前腕30突破］PCマウス・スマホ操作時の疲労ゼロ配当
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed" id="celebration-description">
+          前腕深指屈筋群の剛性が一段引き上がり、毎日のPC業務やスマホ操作で蓄積していた手首の違和感・指の疲労感が日常から完全に消滅します。
+        </p>
+      </div>
+
+      <button onclick="closeCelebrationModal()" class="cyber-btn w-full py-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black text-sm tracking-wide shadow-[0_0_20px_rgba(255,215,0,0.4)]">
+        栄誉を受領する
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. Backup & Restore Modal -->
+  <div id="backup-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4" onclick="if(event.target===this) closeBackupModal()">
+    <div class="cyber-panel rounded-2xl max-w-lg w-full p-5 flex flex-col gap-4 border border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.3)]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-database text-cyan-400"></i>
+          <h3 class="font-bold text-base text-slate-100">データ引継ぎ＆保存管理</h3>
+        </div>
+        <button onclick="closeBackupModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-300">
+        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-cyan-300">① セーブデータ＆お手本画像の書き出し（JSON）</div>
+            <span id="backup-master-status-tag" class="text-[10px] px-2 py-0.5 rounded font-mono bg-slate-800 text-slate-400">画像判定中</span>
+          </div>
+          <p class="text-slate-400">現在のステータス・累計回数・身体配当に加え、<strong class="text-cyan-300">【登録済みのお手本マスター画像】</strong>もすべて1つのJSONファイルに同封して保存します。</p>
+          <button id="export-json-btn" onclick="exportSaveDataJson()" class="cyber-btn px-4 py-2 bg-cyan-950 border border-cyan-400 text-cyan-300 hover:text-white font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-file-export"></i>
+            <span>JSONセーブデータ（画像同封）をダウンロード</span>
+          </button>
+        </div>
+
+        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-amber-300">② セーブデータ＆お手本画像の復元（JSON読み込み）</div>
+          <p class="text-slate-400">保存済みのJSONファイルを選択すると、ステータス・身体配当とお手本画像が全自動で完全復元されます。</p>
+          <input type="file" id="import-json-file" accept=".json" class="text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700" onchange="handleFileImport(event)">
+        </div>
+
+        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
+          <div class="font-bold text-emerald-300">③ アプリ本体の保存（index.html）</div>
+          <p class="text-slate-400">このWebアプリの完全なHTMLファイルを丸ごとダウンロードしてオフラインでも利用できます。</p>
+          <button onclick="downloadAppHtmlFile()" class="cyber-btn px-4 py-2 bg-emerald-950 border border-emerald-400 text-emerald-300 hover:text-white font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-file-code"></i>
+            <span>index.html をダウンロード</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Preset Editor Modal -->
+  <div id="preset-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4" onclick="if(event.target===this) closePresetEditorModal()">
+    <div class="cyber-panel rounded-2xl max-w-md w-full p-5 flex flex-col gap-4 border border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.3)]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-cyan-400"></i>
+          <h3 class="font-bold text-base text-slate-100">食事プリセットの追加・編集</h3>
+        </div>
+        <button onclick="closePresetEditorModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="text-slate-400 font-mono">プリセット名:</label>
+          <input type="text" id="new-preset-title" placeholder="例：【朝のプロテイン特化型】" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-200 mt-1">
+        </div>
+        <div>
+          <label class="text-slate-400 font-mono">登録内容（食材・量）:</label>
+          <textarea id="new-preset-content" rows="3" placeholder="例：完全栄養食30g、牛乳100ml、生卵1個、バナナ1本、水200ml" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-200 mt-1"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button onclick="closePresetEditorModal()" class="cyber-btn px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">キャンセル</button>
+        <button onclick="saveCustomPreset()" class="cyber-btn px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs">プリセット保存</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-8 py-4 border-t border-slate-900 text-center text-xs text-slate-500 font-mono">
+    VALKYRIE-OS // 生体鍛錬＆セルフケア ゲームマスター © 2026 CHALLENGER BIO-HACK LAB
+  </footer>
+
+  <script>
+    /* =========================================================================
+       1. 日本標準時（JST）日付エンジン & ユーティリティ
+       ========================================================================= */
+    function getJstDateString() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const jstNow = new Date(utc + (3600000 * 9));
+      const y = jstNow.getFullYear();
+      const m = String(jstNow.getMonth() + 1).padStart(2, '0');
+      const d = String(jstNow.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getJstDateDisplayString() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const jstNow = new Date(utc + (3600000 * 9));
+      const y = jstNow.getFullYear();
+      const m = String(jstNow.getMonth() + 1).padStart(2, '0');
+      const d = String(jstNow.getDate()).padStart(2, '0');
+      return `${y}.${m}.${d}`;
+    }
+
+    function updateJstCountdown() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const jstNow = new Date(utc + (3600000 * 9));
+      const midnight = new Date(jstNow);
+      midnight.setHours(24, 0, 0, 0);
+      const diffMs = midnight - jstNow;
+      if (diffMs <= 0) {
+        checkJstDayRoll();
+        return;
+      }
+      const h = Math.floor(diffMs / (1000 * 60 * 60));
+      const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diffMs % (1000 * 60)) / 1000);
+      const el = document.getElementById('header-jst-countdown');
+      if (el) {
+        el.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+    }
+
+    function checkJstDayRoll() {
+      if (!appState) return;
+      const todayStr = getJstDateString();
+      if (appState.currentJstDate !== todayStr) {
+        appState.currentJstDate = todayStr;
+        appState.waterIntakeToday = 0;
+        appState.todayModuleGains = { pushup: 0, shoulder: 0, lower: 0, forearm: 0, face: 0, abs: 0 };
+        appState.dailyMissions.forEach(m => m.completed = false);
+        saveAppState();
+        renderAll();
+      }
+    }
+
+    // 6つの固定鍛錬モジュール定義
+    const MODULE_DEFINITIONS = [
+      { 
+        id: 'pushup', 
+        title: '【腕立て】', 
+        subtitle: '胸・三頭筋・体幹', 
+        videoId: 'ZWOHaDqApiU', 
+        videoUrl: 'https://m.youtube.com/watch?v=ZWOHaDqApiU', 
+        icon: 'fa-hand-back-fist' 
+      },
+      { 
+        id: 'shoulder', 
+        title: '【肩・腕】', 
+        subtitle: '肩甲帯・二頭筋・三頭筋', 
+        videoId: 'Fx12MRw9bqw', 
+        videoUrl: 'https://m.youtube.com/watch?v=Fx12MRw9bqw', 
+        icon: 'fa-dumbbell' 
+      },
+      { 
+        id: 'lower', 
+        title: '【下半身】', 
+        subtitle: '大腿四頭筋・臀部・全身代謝', 
+        videoId: 'LOuh44mpQRg', 
+        videoUrl: 'https://m.youtube.com/watch?v=LOuh44mpQRg', 
+        icon: 'fa-person-running' 
+      },
+      { 
+        id: 'forearm', 
+        title: '【前腕】', 
+        subtitle: '握力・手首・末梢血流', 
+        videoId: 'mEatSKR_bhA', 
+        videoUrl: 'https://m.youtube.com/watch?v=mEatSKR_bhA', 
+        icon: 'fa-hand-sparkles' 
+      },
+      { 
+        id: 'face', 
+        title: '【顔マッサージ】', 
+        subtitle: '表情筋・リンパ・フェイスライン', 
+        videoId: '3dAXL4o_Z3I', 
+        videoUrl: 'https://m.youtube.com/watch?v=3dAXL4o_Z3I', 
+        icon: 'fa-face-smile' 
+      },
+      { 
+        id: 'abs', 
+        title: '【腹筋】', 
+        subtitle: '腹直筋・腹斜筋・体幹剛性', 
+        videoId: 'yfF-Q2NhVnE', 
+        videoUrl: 'https://m.youtube.com/watch?v=yfF-Q2NhVnE', 
+        icon: 'fa-shield-halved' 
+      }
+    ];
+
+    // 部位別・実践生化学特化うんちくデータベース
+    const MODULE_SPECIFIC_TRIVIA = {
+      pushup: [
+        "大胸筋のエキセントリック相（伸張局面）での機械的張力はmTOR経路のリン酸化を引き金とし、厚みと輪郭を作る筋原線維の合成を最大36時間促進します。",
+        "プッシュアップ時の体幹ロックにより腹横筋と前鋸筋が同時に動員され、肩甲骨の安定化とブレない上半身の推進軸を獲得できます。"
+      ],
+      shoulder: [
+        "三角筋は羽状筋と紡錘筋が混在するため、高重量の反動よりも持続的テンション維持（TUT）が微小筋肥大と丸みを決定づけます。",
+        "肩甲上腕リズムを整えて三角筋中部・後部を刺激することで、首の付け根（僧帽筋上部）の代償収縮が抑制され、日常の肩こり・巻き肩が劇的に解消されます。"
+      ],
+      lower: [
+        "全身筋肉量の約60%を占める大腿・臀部の動員は、骨格筋ホルモン「マイオカイン」の分泌を促し、全身のインスリン感受性と安静時代謝を36時間引き上げます。",
+        "大腿四頭筋・下腿三頭筋の収縮は「第2の心臓」として静脈還流を倍速化し、末梢の疲労物質クリアランスと脳への酸素供給を同時に加速します。"
+      ],
+      forearm: [
+        "前腕の深指屈筋・腕橈骨筋を活性化させておくことで、複合プッシュ種目での大胸筋への神経駆動が研ぎ澄まされ、手首の代償ブレが消滅します。",
+        "握力・前腕スタビライザーの強化は「神経系の放射効果」を誘発し、PC作業や荷物運搬時でも体幹の反射的安定性を一段底上げします。"
+      ],
+      face: [
+        "咬筋および側頭筋の筋膜リリースは内頸静脈の血流抵抗を低減し、顔面皮下に滞留した細胞外液（むくみ）の排出を30分以内に完了させます。",
+        "大頬骨筋・口角挙筋の神経促通により、無意識の口角下垂がブロックされ、表情筋の血流改善によって肌のハリ感と自然な笑顔が定着します。"
+      ],
+      abs: [
+        "腹横筋と腹斜筋の等尺性収縮は腹腔内圧（IAP）を高め、腰椎L4/L5にかかるせん断荷重を物理的に最大40%分散・保護します。",
+        "深層体幹シリンダーの筋緊張が整うことで骨盤の前傾・反り腰がリセットされ、多めの食事をとった直後でも下腹部が突き出ないフラット軸が維持されます。"
+      ]
+    };
+
+    // フードライブラリ・単品パーツ
+    const FOOD_CATEGORIES = [
+      {
+        name: '主食',
+        items: ['もち麦白米0.8杯', 'もち麦白米0.5杯', 'もち麦白米1杯', '黒チャーハン125g', 'パンケーキ3枚']
+      },
+      {
+        name: '主菜・タンパク質',
+        items: ['アマゾネスWPCプロテイン15g', '完全栄養食30g', '牛しぐれスプーン2杯', 'イワシ1匹', '目玉焼き1個', '卵焼き2切れ', '生卵1個', '納豆1パック', 'サラダチキン10g', '鮭フレークスプーン1杯', '餃子3個', 'ミニソーセージ6本']
+      },
+      {
+        name: '果物・間食',
+        items: ['彦根梨1/4切れ', '桃1/8切れ', 'ゴールドキウイ半分', 'バナナ1本', '日光甚五郎煎餅2枚', '飲む珈琲ゼリー', 'アロエヨーグルト']
+      },
+      {
+        name: '水分・補給',
+        items: ['常温水200ml', '常温水150ml', '牛乳100ml', 'ポカリスエット1口', 'アイスカフェオレ1杯']
+      }
+    ];
+
+    const DEFAULT_APP_STATE = {
+      player: {
+        name: 'CHALLENGER',
+        level: 3.5,
+        totalExp: 210.0,
+        streak: 5,
+        shield: 'OVERDRIVE',
+        shieldHoursRemaining: 96,
+        syncRate: 88
+      },
+      modules: {
+        pushup: { exp: 34.5, count: 2, lastTrained: Date.now() - 18 * 3600 * 1000 },
+        shoulder: { exp: 34.0, count: 2, lastTrained: Date.now() - 48 * 3600 * 1000 },
+        lower: { exp: 42.5, count: 3, lastTrained: Date.now() - 14 * 3600 * 1000 },
+        forearm: { exp: 30.5, count: 1, lastTrained: Date.now() - 65 * 3600 * 1000 },
+        face: { exp: 35.0, count: 0, lastTrained: Date.now() - 32 * 3600 * 1000 },
+        abs: { exp: 33.5, count: 2, lastTrained: Date.now() - 22 * 3600 * 1000 }
+      },
+      todayModuleGains: {
+        pushup: 4.5,
+        shoulder: 0.0,
+        lower: 4.5,
+        forearm: 0.0,
+        face: 0.0,
+        abs: 0.0
+      },
+      lastModuleTrained: 'lower',
+      currentTrivia: {
+        moduleName: '【下半身】',
+        text: "全身筋肉量の約60%を占める大腿・臀部の動員は、骨格筋ホルモン「マイオカイン」の分泌を促し、全身のインスリン感受性と安静時代謝を36時間引き上げます。"
+      },
+      unlockedDividends: [
+        { id: 'div_1', tag: 'Lv.2.5到達', title: 'デスクワーク時の“勝手に胸が開く”オートリセット機能', desc: '長時間着席時でも肩甲骨が自然に寄り、巻き肩・猫背を無意識に防ぎます。' },
+        { id: 'div_2', tag: 'Lv.2.5到達', title: '立ち上がり動作の初速ブースト（重力負荷軽減）', desc: '椅子やソファからの立ち上がり時に足腰の重さを感じず、軽快な推進力が発動。' },
+        { id: 'div_3', tag: '顔ケア30突破', title: 'フェイスラインの浮腫（むくみ）完全ブロック配当', desc: '内頸静脈の血流抵抗低下により、朝の顔の重さやフェイスラインのたるみが即座に解消。' },
+        { id: 'div_4', tag: '下半身30突破', title: '満員電車・移動時の“無意識スタビリティ（不動軸）”配当', desc: '揺れる乗り物の中でも足裏のアーチと臀部が反射的に踏ん張り、吊り革なしでも軸が安定。' },
+        { id: 'div_5', tag: 'Lv.3.0到達', title: 'シャツを着た瞬間の“オート・フレーム補正（逆三角形）”配当', desc: '肩と大胸筋の厚みにより、ジャケットやTシャツのシワが立体的に伸びて見栄えが向上。' },
+        { id: 'div_6', tag: '肩・胸30突破', title: '重い荷物運搬時の“僧帽筋コリ完全回避”配当', desc: '手荷物運搬の荷重を首ではなく肩甲帯・胸郭で受け止めるため、首元の張りがゼロに。' },
+        { id: 'div_7', tag: '前腕30突破', title: 'PCマウス・スマホ操作時の“前腕タイトネス＆指先疲労ゼロ”配当', desc: '握力スタビライザーの強化により、長時間のタイピングやスマホ操作での手首の疲労が消失。' },
+        { id: 'div_8', tag: 'Lv.3.5到達', title: '階段・坂道の“無重力推進ピストン（脚・体幹連動）”配当', desc: '大腿四頭筋と体幹剛性が連動し、急な階段や坂道でも息が上がらずスルスルと登り切れます。' }
+      ],
+      waterIntakeToday: 1450,
+      lastMealRank: 'S',
+      lastMealText: 'もち麦白米0.8杯、イワシ1匹、牛しぐれ、WPCプロテイン15g、水200ml',
+      presets: [
+        { id: 'p1', title: '【朝のフルブースト型】', text: '完全栄養食30g、プロテイン15g、牛乳100ml、もち麦入り白米0.8杯、目玉焼き、牛しぐれ、イワシ1匹、水200ml' },
+        { id: 'p2', title: '【昼のクリーン巡航型】', text: 'もち麦ご飯0.8杯、イワシ1匹、牛しぐれスプーン2杯、バナナ1本、常温水200ml' },
+        { id: 'p3', title: '【夜の胃腸軽負荷型】', text: 'ご飯0.6杯、生卵1個、レトルトカレー、水200ml' },
+        { id: 'p4', title: '【マクドナルド・神ピック】', text: 'ハンバーガー1個、チキンマックナゲット5ピース（マスタード）、水1杯' }
+      ],
+      dailyMissions: [
+        { id: 'm1', title: '水分テレメトリー 1500ml 達成', completed: false, exp: 1.0 },
+        { id: 'm2', title: '優先指定メニューの完遂', completed: true, exp: 2.0 },
+        { id: 'm3', title: '生化学インテリジェンスの確認', completed: true, exp: 0.5 }
+      ],
+      achievements: [
+        { id: 'a1', title: '全ステータス30突破', unlocked: true, icon: 'fa-shield-halved' },
+        { id: 'a2', title: '5日連続ログイン達成', unlocked: true, icon: 'fa-fire' },
+        { id: 'a3', title: '生活恩恵 8件解禁', unlocked: true, icon: 'fa-gem' },
+        { id: 'a4', title: '水分マスター 1400ml', unlocked: true, icon: 'fa-droplet' },
+        { id: 'a5', title: 'アナボリック査定 RANK S', unlocked: true, icon: 'fa-medal' },
+        { id: 'a6', title: '総合プレイヤーLv.4.0', unlocked: false, icon: 'fa-trophy' },
+        { id: 'a7', title: '全ステータス45突破', unlocked: false, icon: 'fa-crown' },
+        { id: 'a8', title: '14日連続パーフェクト', unlocked: false, icon: 'fa-star' }
+      ],
+      todayActions: [
+        { time: '18:40', text: '【下半身】大腿・代謝メニュー完遂 (+4.5 EXP)' },
+        { time: '14:20', text: '水分補給 250ml 注入 (累計: 1450ml)' },
+        { time: '12:30', text: '昼のクリーン巡航型 食事査定実行 (RANK S 獲得)' },
+        { time: '09:15', text: '【腕立て】胸・腕・体幹メニュー完遂 (+4.5 EXP)' }
+      ],
+      currentJstDate: getJstDateString()
+    };
+
+    let appState = null;
+    let currentSortMode = 'urgency';
+    let currentActiveVideoMod = null;
+    let audioCtx = null;
+    let isSoundMuted = true;
+    let cachedMasterTemplateImg = null;
+    let currentMealPhotoBase64 = null;
+    let currentMealPhotoMime = null;
+
+    function handleMealPhotoSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fullDataUrl = e.target.result;
+        currentMealPhotoBase64 = fullDataUrl.split(',')[1];
+        currentMealPhotoMime = file.type || 'image/jpeg';
+
+        const previewContainer = document.getElementById('meal-photo-preview-container');
+        const previewImg = document.getElementById('meal-photo-preview-img');
+        const filenameEl = document.getElementById('meal-photo-filename');
+        const badgeEl = document.getElementById('photo-status-badge');
+
+        if (previewImg) previewImg.src = fullDataUrl;
+        if (filenameEl) filenameEl.textContent = file.name || '食事スキャン画像';
+        if (badgeEl) {
+          badgeEl.textContent = '写真添付中 ✓';
+          badgeEl.className = 'text-[10px] text-emerald-400 font-mono font-bold';
+        }
+        if (previewContainer) previewContainer.classList.remove('hidden');
+
+        playCyberSound('click');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeMealPhoto() {
+      currentMealPhotoBase64 = null;
+      currentMealPhotoMime = null;
+      const previewContainer = document.getElementById('meal-photo-preview-container');
+      const badgeEl = document.getElementById('photo-status-badge');
+      const albumInput = document.getElementById('meal-photo-album-input');
+      const cameraInput = document.getElementById('meal-photo-camera-input');
+      const fileInput = document.getElementById('meal-photo-file-input');
+
+      if (albumInput) albumInput.value = '';
+      if (cameraInput) cameraInput.value = '';
+      if (fileInput) fileInput.value = '';
+      if (previewContainer) previewContainer.classList.add('hidden');
+      if (badgeEl) {
+        badgeEl.textContent = '未添付';
+        badgeEl.className = 'text-[10px] text-cyan-400 font-mono';
+      }
+      playCyberSound('click');
+    }
+
+    async function submitMealAssessment() {
+      const input = document.getElementById('meal-input-text');
+      const rawText = input ? input.value.trim() : '';
+      const hasPhoto = !!currentMealPhotoBase64;
+
+      if (!rawText && !hasPhoto) {
+        showCelebrationModal(
+          'fa-triangle-exclamation',
+          '入力アラート',
+          '【食事情報が必要です】',
+          'テキストで食材を入力するか、写真を撮影・選択してください。',
+          '定番プリセットや単品パーツをタップしてワンタッチで入力することも可能です。'
+        );
+        return;
+      }
+
+      const isAnabolic = document.getElementById('anabolic-window-check')?.checked;
+      const submitBtn = document.getElementById('submit-meal-btn');
+      const btnText = document.getElementById('submit-meal-btn-text');
+      const btnIcon = document.getElementById('submit-meal-icon');
+
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnText) btnText.textContent = '生化学スキャン＆AI査定中...';
+      if (btnIcon) btnIcon.className = 'fa-solid fa-circle-notch fa-spin';
+
+      playCyberSound('click');
+
+      let assessment = null;
+
+      // 1. Try Gemini Multimodal AI Assessment
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const systemPrompt = `あなたはVALKYRIE-OSの生化学・栄養分析オペレーターです。
+ユーザーから提供された食事（写真およびテキストメモ）を分析し、熱意と知性にあふれるサイバーパンクゲームマスターとして査定を行ってください。
+必ず以下の形式の有効なJSONのみを出力してください：
+{
+  "rank": "SS" または "S+" または "S" または "A" または "B",
+  "compliment": "ユーザーが選択した具体的な食材名を名指しした熱烈な賞賛文（60〜100字）",
+  "mechanism": "mTORシグナル伝達、筋グリコーゲン補充、インスリン感受性、オメガ3抗炎症など、この食事によって体内で起こる精密な生化学メカニズムの解説（70〜110字）",
+  "advice": "次回トレ前や夜間に向けた超具体的で実践的な神アップグレード案（50〜90字）",
+  "expGain": 1.5,
+  "shieldHours": 12
+}`;
+
+        const promptText = `【食事査定リクエスト】
+摂取内容テキスト: ${rawText || '（写真から解析してください）'}
+アナボリック・ウィンドウ（鍛錬後120分以内）: ${isAnabolic ? '該当（ボーナス適用）' : '平常時'}`;
+
+        const parts = [{ text: promptText }];
+        if (hasPhoto) {
+          parts.push({
+            inlineData: {
+              mimeType: currentMealPhotoMime || 'image/jpeg',
+              data: currentMealPhotoBase64
+            }
+          });
+        }
+
+        const payload = {
+          contents: [{ parts: parts }],
+          generationConfig: {
+            responseMimeType: "application/json"
+          },
+          systemInstruction: {
+            parts: [{ text: systemPrompt }]
+          }
+        };
+
+        const resp = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (resp.ok) {
+          const resJson = await resp.json();
+          const candidateText = resJson.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (candidateText) {
+            assessment = JSON.parse(candidateText);
+          }
+        }
+      } catch (err) {
+        console.warn('Gemini API call failed, falling back to local biochemical engine:', err);
+      }
+
+      // 2. Fallback: Dynamic Smart Biochemical Rule Engine
+      if (!assessment) {
+        assessment = generateSmartLocalAssessment(rawText, hasPhoto, isAnabolic);
+      }
+
+      // 3. Apply State Updates
+      const rank = assessment.rank || (isAnabolic ? 'SS' : 'S');
+      const expGain = Number(assessment.expGain || (isAnabolic ? 2.0 : 1.5));
+      const shieldHours = Number(assessment.shieldHours || 12);
+
+      appState.lastMealRank = rank;
+      appState.lastMealText = rawText || (hasPhoto ? '【写真添付】生化学スキャン完了食材' : 'バランス補給食');
+      appState.player.totalExp = Number((appState.player.totalExp + expGain).toFixed(1));
+      appState.player.level = Number((appState.player.totalExp / 60).toFixed(1));
+      appState.player.shield = 'OVERDRIVE';
+      appState.player.shieldHoursRemaining = Math.min(120, appState.player.shieldHoursRemaining + shieldHours);
+      appState.player.syncRate = Math.min(100, appState.player.syncRate + 2);
+
+      const nowTime = new Date().toTimeString().slice(0, 8);
+      appState.todayActions.unshift({
+        time: nowTime.slice(0, 5),
+        text: `食事査定実行: [RANK ${rank}] ${appState.lastMealText.slice(0, 20)}... (+${expGain} EXP)`
+      });
+
+      // 4. Update UI Components with High-Visibility Animation
+      const rankBadge = document.getElementById('latest-meal-rank-badge');
+      const complimentEl = document.getElementById('meal-feedback-compliment');
+      const mechanismEl = document.getElementById('meal-feedback-mechanism');
+      const adviceEl = document.getElementById('meal-feedback-advice');
+      const timestampEl = document.getElementById('meal-feedback-timestamp');
+      const expBuffEl = document.getElementById('meal-feedback-exp-buff');
+      const shieldBuffEl = document.getElementById('meal-feedback-shield-buff');
+      const feedbackPanel = document.getElementById('meal-feedback-panel');
+
+      if (rankBadge) {
+        rankBadge.textContent = `RANK ${rank}`;
+        rankBadge.className = 'font-display font-black text-amber-400 text-2xl tracking-wider px-3 py-1 rounded bg-amber-950/80 border border-amber-400 shadow-[0_0_15px_rgba(255,215,0,0.5)] animate-bounce';
+      }
+      if (timestampEl) timestampEl.textContent = `${nowTime} JST (更新完了)`;
+      if (complimentEl) complimentEl.textContent = assessment.compliment;
+      if (mechanismEl) mechanismEl.textContent = assessment.mechanism;
+      if (adviceEl) adviceEl.textContent = assessment.advice;
+      if (expBuffEl) expBuffEl.textContent = `+${expGain.toFixed(1)} EXP`;
+      if (shieldBuffEl) shieldBuffEl.textContent = `+${shieldHours}h 延長`;
+
+      if (feedbackPanel) {
+        feedbackPanel.classList.add('border-amber-400', 'shadow-[0_0_30px_rgba(255,215,0,0.4)]');
+        setTimeout(() => {
+          feedbackPanel.classList.remove('shadow-[0_0_30px_rgba(255,215,0,0.4)]');
+          if (rankBadge) rankBadge.classList.remove('animate-bounce');
+        }, 3000);
+      }
+
+      // Reset Button State
+      if (submitBtn) submitBtn.disabled = false;
+      if (btnText) btnText.textContent = '生化学査定を実行';
+      if (btnIcon) btnIcon.className = 'fa-solid fa-microscope';
+
+      playCyberSound('fanfare');
+
+      showCelebrationModal(
+        'fa-utensils',
+        `生化学査定 RANK ${rank} 確定`,
+        '【食事＆補給テレメトリー更新完了】',
+        `獲得: +${expGain.toFixed(1)} EXP  |  シールド: +${shieldHours}h 延長`,
+        assessment.compliment
+      );
+
+      saveAppState();
+      renderAll();
+    }
+
+    function generateSmartLocalAssessment(text, hasPhoto, isAnabolic) {
+      const t = text.toLowerCase();
+      let rank = isAnabolic ? 'SS' : 'S';
+      let compliment = '';
+      let mechanism = '';
+      let advice = '';
+
+      if (t.includes('プロテイン') || t.includes('完全栄養食') || t.includes('wpc')) {
+        compliment = `プロテイン・完全栄養食による血中アミノ酸プールの急速充填を確認。速効性と持続性の双方を網羅した極めて合理的な選択です。`;
+        mechanism = `摂取後30分でロイシン濃度が閾値を突破し、骨格筋細胞内のmTORC1シグナルが全点火。筋タンパク質合成（MPS）速度が最大化されています。`;
+        advice = `就寝前の胃腸負荷を抑えるため、夜間にマグネシウムまたは常温水150mlを足すと超回復シールドがさらに盤石になります。`;
+      } else if (t.includes('イワシ') || t.includes('魚') || t.includes('鮭') || t.includes('オメガ')) {
+        compliment = `青魚・良質脂質によるオメガ3脂肪酸の補給を高く評価します。筋繊維の微小炎症を先回りして抑制するプロフェッショナルな采配です。`;
+        mechanism = `EPA/DHAが細胞膜リン脂質に速やかに組み込まれ、運動後の過剰な酸化ストレスを中和。筋サテライト細胞の分裂・分化効率が底上げされています。`;
+        advice = `次回トレーニング直前の糖質として日光甚五郎煎餅などの和菓子を1〜2枚合わせると、筋グリコーゲンの初期爆発力が増します。`;
+      } else if (t.includes('牛しぐれ') || t.includes('卵') || t.includes('肉') || t.includes('チキン')) {
+        compliment = `動物性タンパク質とヘム鉄、必須アミノ酸群の完璧なバランスです。筋力発揮に必要な神経伝達物質の材料が十二分に補填されました。`;
+        mechanism = `ヘム鉄とカルニチンがミトコンドリアの電子伝達系を活性化。酸素運搬能とATP再合成速度が高まり、次回トレーニング時の疲労耐性が向上します。`;
+        advice = `消化吸収をサポートするため、常温水200mlとともにビタミンCを含む果物（キウイや柑橘類）を一口添えると鉄分吸収率が倍増します。`;
+      } else if (t.includes('バナナ') || t.includes('米') || t.includes('もち麦') || t.includes('炭水化物')) {
+        compliment = `良質な複合炭水化物の補給により、枯渇した筋グリコーゲンの超回復ルートを確立。筋分解のストッパーとして完璧な働きです。`;
+        mechanism = `インスリンの適度な分泌に伴いGLUT4トランスポーターが細胞膜へ移行。血中グルコースとアミノ酸が骨格筋内へ吸い込まれるように回収されています。`;
+        advice = `アナボリックウィンドウを最大化するため、タンパク質（プロテインまたは卵）を少量同時摂取すると筋合成シグナルが相乗強化されます。`;
+      } else if (hasPhoto) {
+        compliment = `生化学ビジョンスキャン完了。色彩と質感から複合的な三大栄養素のバランスを確認。バランスの取れた素晴らしい食事構成です。`;
+        mechanism = `胃腸での消化吸収フェーズが順調に進行中。栄養素の段階的放出により、安定した血中アミノ酸濃度と持続エネルギーが維持されます。`;
+        advice = `次回は鍛錬直後120分以内のアナボリックウィンドウを意識して補給すると、獲得EXPとシールド維持時間がさらにブーストされます。`;
+      } else {
+        compliment = `バランスの取れた補給報告を受理しました。継続的な栄養補給への高い自己管理意識がステータス維持の源泉です。`;
+        mechanism = `消化器系への過度な負担を避けつつ基礎代謝要求量を充足。細胞内アミノ酸濃度が維持され、異化（筋分解）反応が抑えられています。`;
+        advice = `次回のトレーニング前後に完全栄養食やプロテイン15gをピンポイントで差し込むと、さらに上のRANK SSへと昇格可能です。`;
+      }
+
+      return {
+        rank: rank,
+        compliment: compliment,
+        mechanism: mechanism,
+        advice: advice,
+        expGain: isAnabolic ? 2.0 : 1.5,
+        shieldHours: 12
+      };
+    }
+
+    const MASTER_DB_NAME = 'valkyrie_master_db';
+    const MASTER_STORE_NAME = 'master_templates';
+
+    function openMasterDb() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(MASTER_DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(MASTER_STORE_NAME)) {
+            db.createObjectStore(MASTER_STORE_NAME, { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function storeMasterTemplateImage(dataUrl) {
+      try {
+        const db = await openMasterDb();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(MASTER_STORE_NAME, 'readwrite');
+          const store = tx.objectStore(MASTER_STORE_NAME);
+          store.put({ id: 'active_master', dataUrl: dataUrl, updated: Date.now() });
+          tx.oncomplete = () => {
+            cachedMasterTemplateImg = new Image();
+            cachedMasterTemplateImg.src = dataUrl;
+            cachedMasterTemplateImg.onload = () => resolve(true);
+          };
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (err) {
+        console.error('Failed to store master template:', err);
+        return false;
+      }
+    }
+
+    async function getStoredMasterTemplateImage() {
+      if (cachedMasterTemplateImg) return cachedMasterTemplateImg;
+      try {
+        const db = await openMasterDb();
+        return new Promise((resolve) => {
+          const tx = db.transaction(MASTER_STORE_NAME, 'readonly');
+          const store = tx.objectStore(MASTER_STORE_NAME);
+          const req = store.get('active_master');
+          req.onsuccess = () => {
+            if (req.result && req.result.dataUrl) {
+              const img = new Image();
+              img.src = req.result.dataUrl;
+              img.onload = () => {
+                cachedMasterTemplateImg = img;
+                resolve(img);
+              };
+              img.onerror = () => resolve(null);
+            } else {
+              resolve(null);
+            }
+          };
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function getStoredMasterTemplateDataUrl() {
+      try {
+        const db = await openMasterDb();
+        return new Promise((resolve) => {
+          const tx = db.transaction(MASTER_STORE_NAME, 'readonly');
+          const store = tx.objectStore(MASTER_STORE_NAME);
+          const req = store.get('active_master');
+          req.onsuccess = () => {
+            if (req.result && req.result.dataUrl) {
+              resolve(req.result.dataUrl);
+            } else {
+              resolve(null);
+            }
+          };
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function deleteStoredMasterTemplate() {
+      try {
+        const db = await openMasterDb();
+        return new Promise((resolve) => {
+          const tx = db.transaction(MASTER_STORE_NAME, 'readwrite');
+          const store = tx.objectStore(MASTER_STORE_NAME);
+          store.delete('active_master');
+          tx.oncomplete = () => {
+            cachedMasterTemplateImg = null;
+            resolve(true);
+          };
+          tx.onerror = () => resolve(false);
+        });
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function updateMasterTemplateUI() {
+      const dot = document.getElementById('master-template-status-dot');
+      const label = document.getElementById('master-template-status-label');
+      const resetBtn = document.getElementById('reset-master-btn');
+
+      const master = await getStoredMasterTemplateImage();
+      if (master) {
+        if (dot) {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse';
+        }
+        if (label) {
+          label.innerHTML = '<span class="text-emerald-300 font-bold">★ カスタムお手本マスター稼働中</span>';
+        }
+        if (resetBtn) resetBtn.classList.remove('hidden');
+      } else {
+        if (dot) {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400';
+        }
+        if (label) {
+          label.innerText = '標準プロシージャル描画';
+        }
+        if (resetBtn) resetBtn.classList.add('hidden');
+      }
+    }
+
+    async function handleMasterTemplateUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const dataUrl = e.target.result;
+        await storeMasterTemplateImage(dataUrl);
+        playCyberSound('fanfare');
+        showCelebrationModal(
+          'fa-star',
+          'お手本マスター画像を登録完了',
+          '【高精細3Dホログラムテンプレート適用】',
+          'お手本画像がマスターとして永続保存されました。今後のリアルタイムステータス変化・食事査定・身体配当がこの上に自動合成されます。'
+        );
+        updateMasterTemplateUI();
+        generateSciFiHudImage();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveCurrentAsMasterTemplate() {
+      const container = document.getElementById('hud-image-container');
+      if (!container) return;
+
+      const canvas = container.querySelector('canvas');
+      const img = container.querySelector('img');
+
+      let targetDataUrl = null;
+      if (canvas) {
+        targetDataUrl = canvas.toDataURL('image/png');
+      } else if (img && img.src) {
+        targetDataUrl = img.src;
+      }
+
+      if (targetDataUrl) {
+        await storeMasterTemplateImage(targetDataUrl);
+        playCyberSound('fanfare');
+        showCelebrationModal(
+          'fa-star',
+          '現在のお手本マスターを更新保存',
+          '【新テンプレート登録完了】',
+          '現在の高品位ホログラム画像をお手本として永続保存しました。次回以降のHUD生成時もこのマスターをベースにリアルタイム合成されます。'
+        );
+        updateMasterTemplateUI();
+      }
+    }
+
+    async function resetMasterTemplate() {
+      playCyberSound('click');
+      await deleteStoredMasterTemplate();
+      updateMasterTemplateUI();
+      generateSciFiHudImage();
+    }
+
+    const STORAGE_KEY = 'valkyrie_fit_save_v25';
+
+    function initAppState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          appState = JSON.parse(saved);
+        } else {
+          appState = JSON.parse(JSON.stringify(DEFAULT_APP_STATE));
+        }
+      } catch (e) {
+        console.error('Save state parse error, using default:', e);
+        appState = JSON.parse(JSON.stringify(DEFAULT_APP_STATE));
+      }
+      checkJstDayRoll();
+      checkGlobalDecayAlerts();
+    }
+
+    function saveAppState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.error('Failed to save app state:', e);
+      }
+    }
+
+    function switchMainTab(tabName) {
+      playCyberSound('click');
+      const tabs = ['training', 'nutrition', 'biometrics', 'comms'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`tab-content-${t}`);
+        if (t === tabName) {
+          btn.className = 'px-3.5 py-2 rounded-t-lg font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-300 bg-cyan-950/40';
+          content.classList.remove('hidden');
+        } else {
+          btn.className = 'px-3.5 py-2 rounded-t-lg font-bold text-xs sm:text-sm flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200';
+          content.classList.add('hidden');
+        }
+      });
+      if (tabName === 'biometrics') {
+        setTimeout(renderRadarChart, 50);
+      }
+    }
+
+    function toggleCyberSound() {
+      isSoundMuted = !isSoundMuted;
+      const icon = document.getElementById('sound-icon');
+      if (icon) {
+        icon.className = isSoundMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high text-cyan-400';
+      }
+      if (!isSoundMuted) {
+        playCyberSound('click');
+      }
+    }
+
+    function playCyberSound(type) {
+      if (isSoundMuted) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'fanfare') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          osc.frequency.setValueAtTime(783.99, now + 0.2);
+          osc.frequency.setValueAtTime(1046.50, now + 0.3);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === 'alert') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(350, now);
+          osc.frequency.setValueAtTime(280, now + 0.1);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (err) {
+        // Safe fallback
+      }
+    }
+
+    function calculateLogarithmicGain(currentExp, isFull) {
+      let base = 4.5;
+      if (currentExp >= 80) base = 0.8;
+      else if (currentExp >= 50) base = 2.5;
+      else base = 4.5;
+      return isFull ? base : Number((base * 0.8).toFixed(1));
+    }
+
+    function checkGlobalDecayAlerts() {
+      const banner = document.getElementById('decay-warning-banner');
+      const desc = document.getElementById('decay-warning-desc');
+      if (!banner) return;
+
+      const now = Date.now();
+      let alertTriggered = false;
+      let alertMsg = '';
+
+      Object.entries(appState.modules).forEach(([id, mod]) => {
+        const elapsedHours = (now - mod.lastTrained) / (3600 * 1000);
+        if (elapsedHours >= 93 && elapsedHours < 96) {
+          const remain = Math.max(0, 96 - elapsedHours).toFixed(1);
+          const def = MODULE_DEFINITIONS.find(d => d.id === id);
+          alertTriggered = true;
+          alertMsg = `${def ? def.title : id} が残り ${remain}時間 で第2段階の大幅減衰（ステータス-3）に突入します！今すぐ出撃してください。`;
+        }
+      });
+
+      if (alertTriggered) {
+        banner.classList.remove('hidden');
+        if (desc) desc.textContent = alertMsg;
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function toggleSortMode() {
+      playCyberSound('click');
+      currentSortMode = currentSortMode === 'urgency' ? 'fixed' : 'urgency';
+      const label = document.getElementById('sort-mode-label');
+      if (label) {
+        label.textContent = currentSortMode === 'urgency' ? '緊急度・優先順' : '固定部位順';
+      }
+      renderTrainingCards();
+    }
+
+    function getRecommendedModule() {
+      const now = Date.now();
+      let candidates = MODULE_DEFINITIONS.map(def => {
+        const mod = appState.modules[def.id];
+        const elapsedH = (now - mod.lastTrained) / (3600 * 1000);
+        return { def, mod, elapsedH };
+      });
+      candidates.sort((a, b) => b.elapsedH - a.elapsedH);
+      return candidates[0];
+    }
+
+    function renderTrainingCards() {
+      const container = document.getElementById('training-cards-container');
+      if (!container) return;
+
+      const now = Date.now();
+      let displayList = [...MODULE_DEFINITIONS];
+
+      if (currentSortMode === 'urgency') {
+        displayList.sort((a, b) => {
+          const modA = appState.modules[a.id];
+          const modB = appState.modules[b.id];
+          return (now - modB.lastTrained) - (now - modA.lastTrained);
+        });
+      }
+
+      container.innerHTML = displayList.map(def => {
+        const mod = appState.modules[def.id];
+        const gain = appState.todayModuleGains[def.id] || 0;
+        const elapsedH = (now - mod.lastTrained) / (3600 * 1000);
+        
+        let statusBadge = '';
+        let hoursRemainingText = '';
+        if (elapsedH < 72) {
+          const left = Math.max(0, 72 - elapsedH).toFixed(1);
+          statusBadge = `<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold">超回復中</span>`;
+          hoursRemainingText = `維持完了まで: <strong class="text-emerald-400 font-mono">${left}h</strong>`;
+        } else if (elapsedH < 96) {
+          const left = Math.max(0, 96 - elapsedH).toFixed(1);
+          statusBadge = `<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold">減衰第1段階</span>`;
+          hoursRemainingText = `第2減衰まで: <strong class="text-amber-400 font-mono">${left}h</strong>`;
+        } else {
+          statusBadge = `<span class="px-2 py-0.5 rounded bg-red-950 text-red-300 border border-red-500/40 text-[10px] font-mono font-bold animate-pulse">大幅減衰中</span>`;
+          hoursRemainingText = `<span class="text-red-400 font-mono font-bold">緊急出撃推奨</span>`;
+        }
+
+        const isTrainedToday = gain > 0;
+        const borderClass = isTrainedToday ? 'border-amber-400 shadow-[0_0_15px_rgba(255,215,0,0.25)]' : 'border-slate-800';
+
+        return `
+          <div class="cyber-panel rounded-xl p-4 flex flex-col justify-between gap-3 border ${borderClass} relative overflow-hidden">
+            ${isTrainedToday ? '<div class="absolute top-0 right-0 bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 font-mono">本日完了 +'+gain.toFixed(1)+'▲</div>' : ''}
+            
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-9 h-9 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-cyan-400 text-base">
+                    <i class="fa-solid ${def.icon}"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-slate-100">${def.title}</h4>
+                    <p class="text-[11px] text-slate-400">${def.subtitle}</p>
+                  </div>
+                </div>
+                ${statusBadge}
+              </div>
+
+              <div class="mt-3 space-y-1">
+                <div class="flex justify-between text-xs font-mono">
+                  <span class="text-slate-400">ステータス値:</span>
+                  <span class="text-cyan-400 font-bold">${mod.exp.toFixed(1)} / 100 <span class="text-slate-500 text-[10px]">(累計 ${mod.count}回)</span></span>
+                </div>
+                <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                  <div class="h-full bg-cyan-400" style="width: ${Math.min(100, mod.exp)}%"></div>
+                </div>
+              </div>
+
+              <div class="mt-2 text-[11px] text-slate-400 flex items-center justify-between">
+                <span>${hoursRemainingText}</span>
+                <span class="font-mono text-slate-500">前回: ${elapsedH < 24 ? Math.round(elapsedH) + 'h前' : Math.floor(elapsedH/24) + '日前'}</span>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 flex items-center gap-2">
+              <a href="${def.videoUrl}" target="_blank" rel="noopener noreferrer" 
+                 class="cyber-btn p-2 bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white rounded text-xs flex items-center justify-center" title="YouTube公式で直接開く">
+                <i class="fa-brands fa-youtube"></i>
+              </a>
+
+              <button onclick="openVideoModal('${def.id}')" 
+                      class="cyber-btn flex-1 py-1.5 px-2 bg-cyan-950/70 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-play text-[10px]"></i>
+                <span>動画を開く</span>
+              </button>
+
+              <button onclick="recordWorkout('${def.id}', true)" 
+                      class="cyber-btn py-1.5 px-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-black text-xs font-bold shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+                完遂
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openVideoModal(modId) {
+      playCyberSound('click');
+      currentActiveVideoMod = modId;
+      const def = MODULE_DEFINITIONS.find(d => d.id === modId);
+      if (!def) return;
+
+      const modal = document.getElementById('video-modal');
+      const title = document.getElementById('video-modal-title');
+      const directLink = document.getElementById('video-direct-link');
+      const iframe = document.getElementById('video-iframe');
+
+      if (title) title.textContent = `${def.title} ${def.subtitle}`;
+      if (directLink) directLink.href = def.videoUrl;
+      if (iframe) {
+        iframe.src = `https://www.youtube-nocookie.com/embed/${def.videoId}?rel=0&playsinline=1&enablejsapi=1`;
+      }
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeVideoModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('video-modal');
+      const iframe = document.getElementById('video-iframe');
+      if (iframe) iframe.src = '';
+      if (modal) modal.classList.add('hidden');
+      currentActiveVideoMod = null;
+    }
+
+    function recordWorkoutFromModal(isFull) {
+      if (!currentActiveVideoMod) return;
+      const modId = currentActiveVideoMod;
+      closeVideoModal();
+      recordWorkout(modId, isFull);
+    }
+
+    function recordWorkout(modId, isFull) {
+      const def = MODULE_DEFINITIONS.find(d => d.id === modId);
+      const mod = appState.modules[modId];
+      if (!def || !mod) return;
+
+      const gain = calculateLogarithmicGain(mod.exp, isFull);
+      const oldExp = mod.exp;
+      mod.exp = Math.min(100, Number((mod.exp + gain).toFixed(1)));
+      mod.count += 1;
+      mod.lastTrained = Date.now();
+      appState.todayModuleGains[modId] = (appState.todayModuleGains[modId] || 0) + gain;
+      appState.lastModuleTrained = modId;
+
+      const totalExpSum = Object.values(appState.modules).reduce((sum, m) => sum + m.exp, 0);
+      const oldLevel = appState.player.level;
+      appState.player.totalExp = Number(totalExpSum.toFixed(1));
+      appState.player.level = Number((totalExpSum / 60).toFixed(1));
+
+      const trivias = MODULE_SPECIFIC_TRIVIA[modId] || MODULE_SPECIFIC_TRIVIA.lower;
+      const chosenTrivia = trivias[Math.floor(Math.random() * trivias.length)];
+      appState.currentTrivia = {
+        moduleName: def.title,
+        text: chosenTrivia
+      };
+
+      const timeStr = new Date().toTimeString().slice(0, 5);
+      appState.todayActions.unshift({
+        time: timeStr,
+        text: `${def.title} 鍛錬完遂 (+${gain.toFixed(1)} EXP)`
+      });
+
+      appState.player.shield = 'OVERDRIVE';
+      appState.player.shieldHoursRemaining = 96;
+      appState.player.syncRate = Math.min(100, appState.player.syncRate + 3);
+
+      playCyberSound('fanfare');
+
+      let dividendUnlocked = false;
+      const thresholds = [30, 45, 60, 75, 90];
+      thresholds.forEach(th => {
+        if (oldExp < th && mod.exp >= th) {
+          dividendUnlocked = true;
+          awardBodilyDividend(def.title, th);
+        }
+      });
+
+      if (!dividendUnlocked && appState.player.level >= oldLevel + 0.5) {
+        awardBodilyDividend(`総合レベル Lv.${appState.player.level}`, appState.player.level);
+      } else if (!dividendUnlocked) {
+        showCelebrationModal(
+          'fa-dumbbell',
+          '鍛錬作戦 完了',
+          `${def.title} メニュー完遂！`,
+          `獲得: +${gain.toFixed(1)} EXP  |  ステータス: ${oldExp.toFixed(1)} ➔ ${mod.exp.toFixed(1)}`,
+          `超回復シールドがリフレッシュされ、全身同調率が ${appState.player.syncRate}% に上昇しました。生化学インテリジェンスが即時更新されました。`
+        );
+      }
+
+      saveAppState();
+      renderAll();
+    }
+
+    function awardBodilyDividend(contextName, threshold) {
+      const generatedDividends = [
+        { title: '重荷運搬時の“指先・手首スタビリティ（不動剛性）”配当', desc: '手荷物やPCバッグを持った際、深層腱膜が反射的に締まり指の腱や手首の痛みが日常から消失します。' },
+        { title: '長時間着席時の“骨盤ニュートラル・腰痛完全カット”配当', desc: '体幹インナーユニットがオート作動し、デスクワーク後の立ち上がり時に腰の重さやハリを感じなくなります。' },
+        { title: '階段・急坂の“無重力推進ピストン（脚・体幹連動）”配当', desc: '大腿四頭筋と体幹剛性が連動し、急な坂道や階段でも呼吸を乱さず軽快に駆け上がれるようになります。' },
+        { title: 'ジャケット・シャツ着装時の“オート・フレーム補正（逆三角形）”配当', desc: '胸郭と肩甲帯のフレームが自然に外側へ広がり、上着のシワが綺麗に伸びて佇まいに説得力が宿ります。' },
+        { title: '朝覚醒時の“脳・末梢血流瞬時ブースト（だるさゼロ）”配当', desc: '大筋群の毛細血管網が拡張し、起床直後から全身へ酸素が巡り、目覚まし直後の重だるさが消滅します。' }
+      ];
+
+      const chosen = generatedDividends[Math.floor(Math.random() * generatedDividends.length)];
+      const newDiv = {
+        id: 'div_' + Date.now(),
+        tag: `${contextName}突破`,
+        title: chosen.title,
+        desc: chosen.desc
+      };
+      appState.unlockedDividends.unshift(newDiv);
+
+      showCelebrationModal(
+        'fa-crown',
+        '✦ 生活恩恵（身体配当）解禁 ✦',
+        `［${newDiv.tag}］身体配当の授与`,
+        newDiv.title,
+        newDiv.desc
+      );
+    }
+
+    function showCelebrationModal(iconClass, badge, title, subtitle, desc) {
+      const modal = document.getElementById('celebration-modal');
+      const icon = document.getElementById('celebration-icon');
+      const badgeEl = document.getElementById('celebration-badge');
+      const titleEl = document.getElementById('celebration-title');
+      const subEl = document.getElementById('celebration-subtitle');
+      const descEl = document.getElementById('celebration-description');
+
+      if (icon) icon.className = `fa-solid ${iconClass}`;
+      if (badgeEl) badgeEl.textContent = badge;
+      if (titleEl) titleEl.textContent = title;
+      if (subEl) subEl.textContent = subtitle;
+      if (descEl) descEl.textContent = desc;
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeCelebrationModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('celebration-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function openSortieBriefingModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('sortie-modal');
+      const targetTitle = document.getElementById('sortie-target-title');
+      const targetReason = document.getElementById('sortie-target-reason');
+      const currentStat = document.getElementById('sortie-current-stat');
+      const badge = document.getElementById('sortie-urgency-badge');
+
+      const rec = getRecommendedModule();
+      if (rec) {
+        if (targetTitle) targetTitle.textContent = `${rec.def.title} ${rec.def.subtitle}`;
+        if (currentStat) currentStat.textContent = `${rec.mod.exp.toFixed(1)} / 100`;
+        if (rec.elapsedH >= 72) {
+          if (badge) badge.textContent = '超緊急';
+          if (targetReason) targetReason.textContent = `前回実施から ${Math.round(rec.elapsedH)}時間が経過しています。減衰フェーズに突入しているため、直ちに1セット消化してステータスを防衛してください。`;
+        } else {
+          if (badge) badge.textContent = '推奨';
+          if (targetReason) targetReason.textContent = `前回実施から ${Math.round(rec.elapsedH)}時間が経過し、超回復のゴールデンタイムを迎えています。今消化することで筋原線維の同化を最大化できます。`;
+        }
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeSortieModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('sortie-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function launchTargetSortie() {
+      const rec = getRecommendedModule();
+      closeSortieModal();
+      if (rec) openVideoModal(rec.def.id);
+    }
+
+    function handleEmergencySortie() {
+      openSortieBriefingModal();
+    }
+
+    function renderMealPresets() {
+      const container = document.getElementById('preset-cards-container');
+      if (!container) return;
+
+      container.innerHTML = appState.presets.map(p => `
+        <button onclick="applyPreset('${p.id}')" class="text-left p-2.5 rounded-lg bg-slate-900 border border-slate-700/80 hover:border-cyan-400/80 transition flex flex-col justify-between group">
+          <div class="font-bold text-xs text-cyan-300 group-hover:text-white flex items-center gap-1">
+            <i class="fa-solid fa-bolt text-[10px] text-amber-400"></i>
+            <span>${p.title}</span>
+          </div>
+          <div class="text-[11px] text-slate-400 line-clamp-1 mt-1">${p.text}</div>
+        </button>
+      `).join('');
+    }
+
+    function renderFoodChips() {
+      const container = document.getElementById('food-chips-container');
+      if (!container) return;
+
+      container.innerHTML = FOOD_CATEGORIES.flatMap(cat => 
+        cat.items.map(item => `
+          <button onclick="appendFoodItem('${item}')" class="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-white text-[11px] transition">
+            + ${item}
+          </button>
+        `)
+      ).join('');
+    }
+
+    function applyPreset(presetId) {
+      playCyberSound('click');
+      const p = appState.presets.find(x => x.id === presetId);
+      if (!p) return;
+      const input = document.getElementById('meal-input-text');
+      if (input) {
+        input.value = p.text;
+      }
+    }
+
+    function appendFoodItem(itemName) {
+      playCyberSound('click');
+      const input = document.getElementById('meal-input-text');
+      if (!input) return;
+      if (input.value.trim().length > 0) {
+        input.value += `、${itemName}`;
+      } else {
+        input.value = itemName;
+      }
+    }
+
+    function clearMealInput() {
+      playCyberSound('click');
+      const input = document.getElementById('meal-input-text');
+      if (input) input.value = '';
+    }
+
+    function addWaterIntake(amount, label) {
+      appState.waterIntakeToday = (appState.waterIntakeToday || 0) + amount;
+      const timeStr = new Date().toTimeString().slice(0, 5);
+      appState.todayActions.unshift({
+        time: timeStr,
+        text: `水分補給 ${amount}ml 注入 (${label})`
+      });
+
+      const mission = appState.dailyMissions.find(m => m.id === 'm1');
+      if (mission && !mission.completed && appState.waterIntakeToday >= 1500) {
+        mission.completed = true;
+        appState.player.totalExp += mission.exp;
+        showCelebrationModal(
+          'fa-droplet',
+          'デイリー作戦指令 達成！',
+          '【水分テレメトリー 1500ml 完遂】',
+          `ボーナス: +${mission.exp} EXP 受領`,
+          '細胞内水分バランスが最適化され、筋形質内でのアミノ酸輸送効率が最高潮に達しました。'
+        );
+      }
+
+      playCyberSound('click');
+      saveAppState();
+      renderAll();
+    }
+
+    function openPresetEditorModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('preset-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closePresetEditorModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('preset-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveCustomPreset() {
+      const title = document.getElementById('new-preset-title')?.value.trim();
+      const content = document.getElementById('new-preset-content')?.value.trim();
+      if (!title || !content) return;
+
+      appState.presets.push({
+        id: 'p_' + Date.now(),
+        title: title.startsWith('【') ? title : `【${title}】`,
+        text: content
+      });
+
+      playCyberSound('fanfare');
+      closePresetEditorModal();
+      saveAppState();
+      renderMealPresets();
+    }
+
+    function renderDividendsList() {
+      const container = document.getElementById('dividends-container');
+      if (!container) return;
+
+      container.innerHTML = appState.unlockedDividends.map(d => `
+        <div class="p-3 rounded-lg bg-slate-900 border border-amber-500/30 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 font-mono">${d.tag}</span>
+            <i class="fa-solid fa-gem text-amber-400 text-xs"></i>
+          </div>
+          <h5 class="font-bold text-xs text-slate-100">${d.title}</h5>
+          <p class="text-[11px] text-slate-400 leading-relaxed">${d.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderDailyMissions() {
+      const container = document.getElementById('daily-missions-container');
+      if (!container) return;
+
+      container.innerHTML = appState.dailyMissions.map(m => `
+        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <i class="fa-solid ${m.completed ? 'fa-circle-check text-emerald-400' : 'fa-circle text-slate-600'}"></i>
+            <span class="text-xs ${m.completed ? 'text-slate-400 line-through' : 'text-slate-200'}">${m.title}</span>
+          </div>
+          <span class="text-xs font-mono font-bold ${m.completed ? 'text-emerald-400' : 'text-amber-400'}">+${m.exp} EXP</span>
+        </div>
+      `).join('');
+    }
+
+    function renderAchievements() {
+      const container = document.getElementById('achievements-container');
+      if (!container) return;
+
+      container.innerHTML = appState.achievements.map(a => `
+        <div class="p-2.5 rounded-lg text-center flex flex-col items-center gap-1.5 ${a.unlocked ? 'bg-purple-950/40 border border-purple-500/40 text-purple-200' : 'bg-slate-900/50 border border-slate-800 text-slate-600 opacity-60'}">
+          <i class="fa-solid ${a.icon} text-lg ${a.unlocked ? 'text-purple-400' : 'text-slate-600'}"></i>
+          <span class="text-[11px] font-bold">${a.title}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderRadarChart() {
+      const canvas = document.getElementById('radar-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const radius = 95;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const keys = ['pushup', 'shoulder', 'lower', 'forearm', 'face', 'abs'];
+      const labels = ['胸・腕', '肩・腕', '下半身', '前腕', '顔ケア', '腹筋'];
+      const totalAxes = keys.length;
+
+      for (let level = 1; level <= 4; level++) {
+        const r = (radius / 4) * level;
+        ctx.beginPath();
+        for (let i = 0; i < totalAxes; i++) {
+          const angle = (Math.PI * 2 / totalAxes) * i - Math.PI / 2;
+          const x = cx + r * Math.cos(angle);
+          const y = cy + r * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      for (let i = 0; i < totalAxes; i++) {
+        const angle = (Math.PI * 2 / totalAxes) * i - Math.PI / 2;
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.2)';
+        ctx.stroke();
+
+        const lx = cx + (radius + 22) * Math.cos(angle);
+        const ly = cy + (radius + 22) * Math.sin(angle);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 11px "Noto Sans JP", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(labels[i], lx, ly);
+      }
+
+      ctx.beginPath();
+      keys.forEach((k, i) => {
+        const mod = appState.modules[k];
+        const valRatio = Math.min(1, Math.max(0.1, (mod.exp || 20) / 100));
+        const r = radius * valRatio;
+        const angle = (Math.PI * 2 / totalAxes) * i - Math.PI / 2;
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.25)';
+      ctx.fill();
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      keys.forEach((k, i) => {
+        const mod = appState.modules[k];
+        const isTrained = (appState.todayModuleGains[k] || 0) > 0;
+        const valRatio = Math.min(1, Math.max(0.1, (mod.exp || 20) / 100));
+        const r = radius * valRatio;
+        const angle = (Math.PI * 2 / totalAxes) * i - Math.PI / 2;
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+
+        ctx.beginPath();
+        ctx.arc(x, y, isTrained ? 5 : 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = isTrained ? '#ffd700' : '#00f0ff';
+        ctx.fill();
+        ctx.strokeStyle = '#04060a';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+    }
+
+    function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+      const chars = text.split('');
+      let line = '';
+      let curY = y;
+      for (let n = 0; n < chars.length; n++) {
+        const testLine = line + chars[n];
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, x, curY);
+          line = chars[n];
+          curY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, curY);
+    }
+
+    function drawHudBox(ctx, x, y, w, h, title, accentColor) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(10, 16, 28, 0.85)';
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = accentColor || 'rgba(0, 240, 255, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, w, h);
+
+      ctx.fillStyle = accentColor || '#00f0ff';
+      ctx.fillRect(x, y, 6, h);
+
+      if (title) {
+        ctx.fillStyle = accentColor || '#00f0ff';
+        ctx.font = 'bold 11px "Noto Sans JP", monospace';
+        ctx.fillText(`■ ${title}`, x + 14, y + 16);
+      }
+      ctx.restore();
+    }
+
+    function drawRealisticCyberSilhouette(ctx, cx, cy, scale, gains) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+
+      ctx.save();
+      ctx.translate(0, 280);
+      ctx.scale(1, 0.28);
+      ctx.beginPath();
+      ctx.arc(0, 0, 160, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, 120, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.3)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.7)';
+      ctx.lineWidth = 2;
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.08)';
+
+      // Head
+      ctx.beginPath();
+      ctx.ellipse(0, -180, 28, 38, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Chest
+      const isChestTrained = (gains.pushup || 0) > 0;
+      ctx.beginPath();
+      ctx.moveTo(-50, -110);
+      ctx.lineTo(50, -110);
+      ctx.lineTo(40, -50);
+      ctx.lineTo(-40, -50);
+      ctx.closePath();
+      ctx.fillStyle = isChestTrained ? 'rgba(255, 215, 0, 0.35)' : 'rgba(0, 240, 255, 0.15)';
+      ctx.fill();
+      ctx.strokeStyle = isChestTrained ? '#ffd700' : 'rgba(0, 240, 255, 0.8)';
+      ctx.stroke();
+
+      // Six-pack Abs
+      const isAbsTrained = (gains.abs || 0) > 0;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.rect(-22, -40 + i * 22, 44, 18);
+        ctx.fillStyle = isAbsTrained ? 'rgba(255, 215, 0, 0.35)' : 'rgba(0, 240, 255, 0.12)';
+        ctx.fill();
+        ctx.strokeStyle = isAbsTrained ? '#ffd700' : 'rgba(0, 240, 255, 0.7)';
+        ctx.stroke();
+      }
+
+      // Legs
+      const isLegsTrained = (gains.lower || 0) > 0;
+      [-1, 1].forEach(side => {
+        ctx.beginPath();
+        ctx.ellipse(side * 36, 120, 22, 60, side * 0.08, 0, Math.PI * 2);
+        ctx.fillStyle = isLegsTrained ? 'rgba(255, 215, 0, 0.35)' : 'rgba(0, 240, 255, 0.12)';
+        ctx.fill();
+        ctx.strokeStyle = isLegsTrained ? '#ffd700' : 'rgba(0, 240, 255, 0.7)';
+        ctx.stroke();
+      });
+
+      // Shoulders & Arms
+      const isShoulderTrained = (gains.shoulder || 0) > 0;
+      const isForearmTrained = (gains.forearm || 0) > 0;
+      [-1, 1].forEach(side => {
+        ctx.beginPath();
+        ctx.ellipse(side * 75, -110, 20, 26, side * 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = isShoulderTrained ? 'rgba(255, 215, 0, 0.35)' : 'rgba(0, 240, 255, 0.15)';
+        ctx.fill();
+        ctx.strokeStyle = isShoulderTrained ? '#ffd700' : 'rgba(0, 240, 255, 0.8)';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.ellipse(side * 105, 10, 14, 45, side * 0.15, 0, Math.PI * 2);
+        ctx.fillStyle = isForearmTrained ? 'rgba(255, 215, 0, 0.35)' : 'rgba(0, 240, 255, 0.12)';
+        ctx.fill();
+        ctx.strokeStyle = isForearmTrained ? '#ffd700' : 'rgba(0, 240, 255, 0.7)';
+        ctx.stroke();
+      });
+
+      ctx.restore();
+    }
+
+    function drawCalloutPointer(ctx, sx, sy, tx, ty, label, val, gain) {
+      const isTrained = (gain || 0) > 0;
+      ctx.save();
+      ctx.strokeStyle = isTrained ? '#ffd700' : 'rgba(0, 240, 255, 0.5)';
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = isTrained ? '#ffd700' : '#00f0ff';
+      ctx.fill();
+      ctx.stroke();
+
+      const midX = sx < tx ? sx + 30 : sx - 30;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(midX, ty);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+
+      ctx.font = 'bold 11px "Noto Sans JP", sans-serif';
+      ctx.textAlign = sx < tx ? 'left' : 'right';
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(label, tx, ty - 6);
+
+      if (isTrained) {
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 11px "Chakra Petch", monospace';
+        const base = Math.max(0, val - gain).toFixed(1);
+        ctx.fillText(`${base} ➔ ${val.toFixed(1)} (+${gain.toFixed(1)}▲)`, tx, ty + 12);
+      } else {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px "Chakra Petch", monospace';
+        ctx.fillText(`${val.toFixed(1)} / 100`, tx, ty + 12);
+      }
+
+      ctx.restore();
+    }
+
+    function renderMasterTemplateOverlay(ctx, masterImg, w, h) {
+      ctx.drawImage(masterImg, 0, 0, w, h);
+
+      // Header overlay
+      ctx.save();
+      ctx.fillStyle = 'rgba(4, 8, 16, 0.82)';
+      ctx.fillRect(30, 24, 660, 48);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(30, 24, 660, 48);
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = 'bold 15px "Orbitron", sans-serif';
+      ctx.fillText('VALKYRIE-OS // 生体ステータスHUD', 48, 52);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = 'bold 11px "Chakra Petch", "Noto Sans JP", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`OP: ${appState.player.name}  |  Lv.${appState.player.level} (${appState.player.totalExp.toFixed(1)}/600)  |  ${getJstDateDisplayString()} JST`, 670, 52);
+      ctx.restore();
+
+      // Callout Stat Overlays
+      const pointerTargets = [
+        { key: 'pushup', x: 120, y: 175, align: 'left' },
+        { key: 'shoulder', x: 125, y: 300, align: 'left' },
+        { key: 'lower', x: 125, y: 590, align: 'left' },
+        { key: 'face', x: 595, y: 110, align: 'right' },
+        { key: 'forearm', x: 595, y: 310, align: 'right' },
+        { key: 'abs', x: 595, y: 530, align: 'right' }
+      ];
+
+      pointerTargets.forEach(target => {
+        const mod = appState.modules[target.key];
+        const gain = appState.todayModuleGains[target.key] || 0;
+        const isTrained = gain > 0;
+
+        ctx.save();
+        ctx.textAlign = target.align;
+
+        const badgeW = 160;
+        const badgeH = 24;
+        const bx = target.align === 'left' ? target.x : target.x - badgeW;
+        const by = target.y + 40;
+
+        ctx.fillStyle = isTrained ? 'rgba(28, 20, 8, 0.92)' : 'rgba(10, 16, 28, 0.78)';
+        ctx.fillRect(bx, by, badgeW, badgeH);
+        ctx.strokeStyle = isTrained ? 'rgba(255, 215, 0, 0.85)' : 'rgba(0, 240, 255, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(bx, by, badgeW, badgeH);
+
+        ctx.font = 'bold 11px "Noto Sans JP", sans-serif';
+        if (isTrained) {
+          const baseVal = Math.max(0, mod.exp - gain).toFixed(1);
+          ctx.fillStyle = '#ffd700';
+          const text = `${baseVal} ➔ ${mod.exp.toFixed(1)} (+${gain.toFixed(1)}▲)`;
+          ctx.fillText(text, target.align === 'left' ? bx + 8 : bx + badgeW - 8, by + 16);
+        } else {
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillText(`${mod.exp.toFixed(1)} / 100`, target.align === 'left' ? bx + 8 : bx + badgeW - 8, by + 16);
+        }
+        ctx.restore();
+      });
+
+      // Bottom Panels
+      drawHudBox(ctx, 35, 1140, 315, 115, '生化学・食事＆身体配当', '#f59e0b');
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 16px "Orbitron", sans-serif';
+      ctx.fillText(`RANK ${appState.lastMealRank}`, 50, 1180);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '10px "Noto Sans JP", sans-serif';
+      const divTitle = appState.unlockedDividends[7]?.title || appState.unlockedDividends[0]?.title || '';
+      ctx.fillText(`水分: ${appState.waterIntakeToday}ml | シールド: ${appState.player.shieldHoursRemaining}h`, 140, 1175);
+      ctx.fillStyle = '#a7f3d0';
+      ctx.fillText(`✦ 配当: ${divTitle.slice(0, 18)}...`, 50, 1205);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`※他 ${appState.unlockedDividends.length - 1} 件の身体配当が稼働中`, 50, 1228);
+
+      drawHudBox(ctx, 370, 1140, 315, 115, `生化学知見（${appState.currentTrivia.moduleName} 特化）`, '#10b981');
+      ctx.fillStyle = '#a7f3d0';
+      ctx.font = '10px "Noto Sans JP", sans-serif';
+      wrapCanvasText(ctx, `「${appState.currentTrivia.text}」`, 385, 1172, 285, 16);
+    }
+
+    async function generateSciFiHudImage() {
+      playCyberSound('click');
+      const modal = document.getElementById('hud-image-modal');
+      const container = document.getElementById('hud-image-container');
+      if (!modal || !container) return;
+
+      modal.classList.remove('hidden');
+      updateMasterTemplateUI();
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 720;
+      canvas.height = 1280;
+      const ctx = canvas.getContext('2d');
+
+      const masterImg = await getStoredMasterTemplateImage();
+      if (masterImg) {
+        renderMasterTemplateOverlay(ctx, masterImg, 720, 1280);
+      } else {
+        const bgGrad = ctx.createRadialGradient(360, 420, 50, 360, 640, 680);
+        bgGrad.addColorStop(0, '#0a1628');
+        bgGrad.addColorStop(0.6, '#060a14');
+        bgGrad.addColorStop(1, '#020408');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 720, 1280);
+
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.035)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= 720; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1280); ctx.stroke();
+        }
+        for (let y = 0; y <= 1280; y += 40) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(720, y); ctx.stroke();
+        }
+
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(20, 20, 680, 1240);
+
+        ctx.fillStyle = '#00f0ff';
+        ctx.font = 'bold 22px "Orbitron", sans-serif';
+        ctx.fillText('VALKYRIE-OS // 生体ステータスHUD', 42, 64);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px "Chakra Petch", "Noto Sans JP", sans-serif';
+        ctx.fillText(`OPERATOR: ${appState.player.name}  |  Lv.${appState.player.level} (${appState.player.totalExp.toFixed(1)}/600)  |  ${getJstDateDisplayString()} JST`, 42, 92);
+
+        drawRealisticCyberSilhouette(ctx, 360, 380, 0.88, appState.todayModuleGains);
+
+        drawCalloutPointer(ctx, 312, 272, 55, 235, '【腕立て】胸・腕', appState.modules.pushup.exp, appState.todayModuleGains.pushup);
+        drawCalloutPointer(ctx, 420, 272, 665, 235, '【肩・腕】肩甲帯', appState.modules.shoulder.exp, appState.todayModuleGains.shoulder);
+        drawCalloutPointer(ctx, 295, 412, 55, 380, '【前腕】把持力', appState.modules.forearm.exp, appState.todayModuleGains.forearm);
+        drawCalloutPointer(ctx, 382, 322, 665, 335, '【腹筋】体幹剛性', appState.modules.abs.exp, appState.todayModuleGains.abs);
+        drawCalloutPointer(ctx, 330, 485, 55, 510, '【下半身】大腿・代謝', appState.modules.lower.exp, appState.todayModuleGains.lower);
+        drawCalloutPointer(ctx, 380, 188, 665, 175, '【顔ケア】表情筋', appState.modules.face.exp, appState.todayModuleGains.face);
+
+        drawHudBox(ctx, 42, 680, 636, 88, '生化学・食事判定', '#f59e0b');
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'black 22px "Orbitron", sans-serif';
+        ctx.fillText(`RANK ${appState.lastMealRank}`, 62, 726);
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '12px "Noto Sans JP", sans-serif';
+        ctx.fillText(`摂取査定: ${appState.lastMealText.slice(0, 38)}...`, 185, 715);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText(`維持シールド: ${appState.player.shield} (${appState.player.shieldHoursRemaining}h)  |  本日水分: ${appState.waterIntakeToday}ml`, 185, 740);
+
+        drawHudBox(ctx, 42, 780, 636, 120, '生活恩恵（身体配当録）', '#00f0ff');
+        const div1 = appState.unlockedDividends[7] || appState.unlockedDividends[0];
+        const div2 = appState.unlockedDividends[6] || appState.unlockedDividends[1];
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 12px "Noto Sans JP", sans-serif';
+        ctx.fillText(`✦ ${div1.title}`, 62, 822);
+        ctx.fillText(`✦ ${div2.title}`, 62, 852);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px "Noto Sans JP", sans-serif';
+        ctx.fillText(`※他 ${appState.unlockedDividends.length - 2} 件の身体配当がリアル稼働中（次回解禁: 各部位45突破 / Lv.4.0）`, 62, 882);
+
+        drawHudBox(ctx, 42, 912, 636, 128, `生化学インテリジェンス（${appState.currentTrivia.moduleName} 特化知見）`, '#10b981');
+        ctx.fillStyle = '#a7f3d0';
+        ctx.font = '12px "Noto Sans JP", sans-serif';
+        wrapCanvasText(ctx, `「${appState.currentTrivia.text}」`, 62, 948, 595, 20);
+
+        drawHudBox(ctx, 42, 1052, 636, 168, '本日の作戦記録 (JST)', '#a855f7');
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '11px "Chakra Petch", monospace';
+        const logs = appState.todayActions.slice(0, 4);
+        logs.forEach((log, idx) => {
+          ctx.fillText(`[${log.time}]  ${log.text}`, 62, 1092 + idx * 26);
+        });
+      }
+
+      container.innerHTML = '';
+      canvas.className = 'max-w-full h-auto rounded-lg shadow-2xl';
+      container.appendChild(canvas);
+    }
+
+    function closeHudImageModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('hud-image-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function downloadCurrentHudImage() {
+      playCyberSound('click');
+      const container = document.getElementById('hud-image-container');
+      if (!container) return;
+
+      const canvas = container.querySelector('canvas');
+      const img = container.querySelector('img');
+      let dataUrl = null;
+
+      if (canvas) {
+        dataUrl = canvas.toDataURL('image/png');
+      } else if (img && img.src) {
+        dataUrl = img.src;
+      }
+
+      if (!dataUrl) return;
+
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `valkyrie-hud-${getJstDateString()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    async function requestAiEnhancedHudImage() {
+      playCyberSound('click');
+      const container = document.getElementById('hud-image-container');
+      if (!container) return;
+
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center p-12 text-center text-cyan-400 gap-3">
+          <i class="fa-solid fa-circle-notch fa-spin text-3xl"></i>
+          <span class="font-mono text-xs">Gemini 3.1 Flash Image 超美麗3Dホログラム生成中...</span>
+          <span class="text-[10px] text-slate-400">Unreal Engine 5・生体ボリューメトリック・レンダリング</span>
+        </div>
+      `;
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+        
+        const trainedList = Object.entries(appState.todayModuleGains)
+          .filter(([k, v]) => v > 0)
+          .map(([k]) => {
+            const def = MODULE_DEFINITIONS.find(d => d.id === k);
+            return def ? def.title : k;
+          });
+        const trainedSummary = trainedList.length > 0 ? trainedList.join(', ') : '腕立て, 腹筋';
+
+        const prompt = `An ultra-realistic, cinema-grade 3D volumetric medical holographic projection wallpaper for iPhone in 9:16 vertical ratio.
+        Centered stunning, aesthetic athletic male physique hologram standing in a heroic posture, with visible glowing cybernetic spine, anatomical muscle striations, and translucent glass-like voxel point-cloud volume.
+        Projected vertically from an illuminated circular sci-fi floor emitter ring with visible laser light shafts and floating ambient bioluminescent particles.
+        The trained muscle groups (${trainedSummary}) are supercharged with intense, hyper-realistic glowing molten golden-amber plasma energy, electrical lightning arcs, and radiant heat motes.
+        Untrained muscle groups glow in calm, deep translucent cyan wireframe and volumetric light.
+        High-precision cybernetic callout pointer lines extend from the muscles with clean Japanese labels: "【腕立て】胸・腕", "【肩・腕】肩甲帯", "【下半身】大腿・代謝", "【前腕】把持力", "【顔ケア】表情筋", "【腹筋】体幹剛性".
+        Bottom section features sleek futuristic Japanese glassmorphic HUD telemetry boxes:
+        "■ 生化学・食事判定 (RANK ${appState.lastMealRank})",
+        "■ 生活恩恵（身体配当録）",
+        "■ 生化学インテリジェンス: ${appState.currentTrivia.moduleName}".
+        Octane render, Unreal Engine 5.4, ray-traced subsurface scattering, 8k resolution, photorealistic sci-fi cybernetic interface.`;
+
+        const payload = {
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseModalities: ['IMAGE'],
+            imageConfig: { aspectRatio: "9:16" }
+          }
+        };
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+        if (base64Data) {
+          const imgUrl = `data:image/png;base64,${base64Data}`;
+          container.innerHTML = `
+            <div class="relative w-full flex flex-col items-center">
+              <img src="${imgUrl}" class="max-w-full h-auto rounded-lg shadow-2xl" alt="AI Generated HUD">
+              <div class="absolute top-2 right-2">
+                <button onclick="saveCurrentAsMasterTemplate()" class="cyber-btn px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-black font-bold text-[11px] shadow-lg flex items-center gap-1">
+                  <i class="fa-solid fa-star"></i>
+                  <span>このAI画像をお手本に登録</span>
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          generateSciFiHudImage();
+        }
+      } catch (e) {
+        generateSciFiHudImage();
+      }
+    }
+
+    let lastOperatorSpeechText = '';
+
+    function appendCommsMessage(role, text) {
+      const box = document.getElementById('comms-messages-box');
+      if (!box) return;
+
+      const isOp = role === 'operator';
+      if (isOp) lastOperatorSpeechText = text;
+
+      const msgEl = document.createElement('div');
+      msgEl.className = `p-3 rounded-lg flex flex-col gap-1 ${isOp ? 'bg-cyan-950/40 border border-cyan-500/30 text-cyan-100' : 'bg-slate-900 border border-slate-700 text-slate-200'}`;
+      msgEl.innerHTML = `
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
+          <span class="${isOp ? 'text-cyan-400 font-bold' : 'text-slate-300'}">${isOp ? 'VALKYRIE OPERATOR' : appState.player.name}</span>
+          <span>${new Date().toTimeString().slice(0, 8)}</span>
+        </div>
+        <div class="whitespace-pre-line text-xs sm:text-sm font-sans">${text}</div>
+      `;
+      box.appendChild(msgEl);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function sendCommsMessage() {
+      const input = document.getElementById('comms-user-input');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      appendCommsMessage('user', text);
+      input.value = '';
+      playCyberSound('click');
+
+      setTimeout(() => {
+        const lower = text.toLowerCase();
+        if (text.includes('画像') || lower.includes('hud') || text.includes('見せて')) {
+          appendCommsMessage('operator', '了解。iPhone用 縦長HUDステータス画面 (9:16) を生成・展開します。');
+          generateSciFiHudImage();
+        } else if (text.includes('今からやるなら') || text.includes('おすすめ') || text.includes('何やる')) {
+          const rec = getRecommendedModule();
+          appendCommsMessage('operator', `作戦司令部より勧告。現在の生体同調状況から、最優先推奨は【${rec.def.title}】です。前回の消化から ${Math.round(rec.elapsedH)}時間 が経過しています。`);
+          openSortieBriefingModal();
+        } else if (text.includes('腹筋') || text.includes('腕立て') || text.includes('下半身') || text.includes('肩') || text.includes('前腕') || text.includes('顔')) {
+          let matched = MODULE_DEFINITIONS.find(d => text.includes(d.title.replace(/[【】]/g, '')));
+          if (!matched) matched = MODULE_DEFINITIONS[0];
+          recordWorkout(matched.id, true);
+          appendCommsMessage('operator', `鍛錬報告を受領しました。【${matched.title}】の完遂を記録し、ステータスを即時上昇させました。`);
+        } else {
+          appendCommsMessage('operator', `報告を受理しました。全ステータス同調率は ${appState.player.syncRate}% を維持。本日の生体インテリジェンス（${appState.currentTrivia.moduleName}）を念頭に、良質な休息と水分補給を継続してください。`);
+        }
+      }, 500);
+    }
+
+    function speakLastOperatorMessage() {
+      if (!lastOperatorSpeechText || !('speechSynthesis' in window)) return;
+      playCyberSound('click');
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(lastOperatorSpeechText);
+      utter.lang = 'ja-JP';
+      utter.pitch = 1.05;
+      utter.rate = 1.05;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function clearCommsHistory() {
+      playCyberSound('click');
+      const box = document.getElementById('comms-messages-box');
+      if (box) box.innerHTML = '';
+      appendCommsMessage('operator', '通信ログを消去しました。オペレーターは常時待機中です。');
+    }
+
+    async function openBackupModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('backup-modal');
+      const statusTag = document.getElementById('backup-master-status-tag');
+      if (statusTag) {
+        const hasImg = await getStoredMasterTemplateDataUrl();
+        if (hasImg) {
+          statusTag.className = 'text-[10px] px-2 py-0.5 rounded font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/40';
+          statusTag.innerHTML = '★ お手本画像あり（同封保存）';
+        } else {
+          statusTag.className = 'text-[10px] px-2 py-0.5 rounded font-mono bg-slate-800 text-slate-400 border border-slate-700';
+          statusTag.innerHTML = 'お手本画像なし（数値のみ）';
+        }
+      }
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeBackupModal() {
+      playCyberSound('click');
+      const modal = document.getElementById('backup-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function exportSaveDataJson() {
+      playCyberSound('fanfare');
+      const exportBtn = document.getElementById('export-json-btn');
+      if (exportBtn) {
+        exportBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>エクスポート生成中...';
+      }
+
+      const masterDataUrl = await getStoredMasterTemplateDataUrl();
+      const exportPayload = {
+        version: '2.5',
+        exportedAt: new Date().toISOString(),
+        appState: appState,
+        masterTemplateDataUrl: masterDataUrl || null
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+      const a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `valkyrie-save-${getJstDateString()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      if (exportBtn) {
+        exportBtn.innerHTML = '<i class="fa-solid fa-file-export mr-1.5"></i>JSONセーブデータ（画像同封）をダウンロード';
+      }
+    }
+
+    async function handleFileImport(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          let targetState = null;
+          let masterDataUrl = null;
+
+          // 新フォーマット (version 2.5: appStateと画像を内包) と 旧フォーマット (appState直書き) の両方に対応
+          if (imported.appState) {
+            targetState = imported.appState;
+            masterDataUrl = imported.masterTemplateDataUrl;
+          } else if (imported.player && imported.modules) {
+            targetState = imported;
+            masterDataUrl = imported.masterTemplateDataUrl || null;
+          }
+
+          if (targetState && targetState.player && targetState.modules) {
+            appState = targetState;
+            saveAppState();
+
+            // お手本画像データの自動復元
+            if (masterDataUrl) {
+              await storeMasterTemplateImage(masterDataUrl);
+              await updateMasterTemplateUI();
+            }
+
+            renderAll();
+            playCyberSound('fanfare');
+            closeBackupModal();
+
+            const imageRestoredText = masterDataUrl 
+              ? '【お手本マスター画像（3Dホログラム）も完全に復元・登録されました】' 
+              : '（※お手本画像データは同封されていませんでした）';
+
+            showCelebrationModal(
+              'fa-database',
+              'データ＆お手本画像の復元 成功',
+              '【完全セーブデータの同期完了】',
+              `プレイヤー: ${appState.player.name} (Lv.${appState.player.level})`,
+              `全6部位の鍛錬ステータス、解禁済み身体配当、水分記録、および${imageRestoredText}`
+            );
+          } else {
+            throw new Error('Invalid save data format');
+          }
+        } catch (err) {
+          console.error('Import parse error:', err);
+          showCelebrationModal(
+            'fa-triangle-exclamation',
+            '読み込みエラー',
+            '【ファイルの形式が正しくありません】',
+            '有効なVALKYRIE-OSのセーブデータJSONファイルを選択してください。',
+            'ファイルが破損しているか、古い形式の可能性があります。'
+          );
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function downloadAppHtmlFile() {
+      playCyberSound('fanfare');
+      const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'Cyberpunk-Fit-GameMaster.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function renderAll() {
+      if (!appState) return;
+
+      const nameEl = document.getElementById('header-player-name');
+      const lvlEl = document.getElementById('header-player-level');
+      const streakEl = document.getElementById('header-player-streak');
+      const summaryLvl = document.getElementById('summary-player-level');
+      const summaryExp = document.getElementById('summary-total-exp');
+      const summaryExpBar = document.getElementById('summary-exp-bar');
+      const summaryShield = document.getElementById('summary-shield-status');
+      const summarySync = document.getElementById('summary-sync-rate');
+      const commsSync = document.getElementById('comms-sync-rate');
+      const waterDisplay = document.getElementById('water-current-display');
+
+      if (nameEl) nameEl.textContent = appState.player.name;
+      if (lvlEl) lvlEl.textContent = `Lv.${appState.player.level}`;
+      if (streakEl) streakEl.textContent = appState.player.streak;
+      if (summaryLvl) summaryLvl.textContent = `Lv.${appState.player.level}`;
+      if (summaryExp) summaryExp.textContent = `${appState.player.totalExp.toFixed(1)} / 600`;
+      if (summaryExpBar) {
+        const ratio = Math.min(100, (appState.player.totalExp / 600) * 100);
+        summaryExpBar.style.width = `${ratio}%`;
+      }
+      if (summaryShield) summaryShield.textContent = `${appState.player.shield} (${appState.player.shieldHoursRemaining}h維持)`;
+      if (summarySync) summarySync.textContent = `${appState.player.syncRate}%`;
+      if (commsSync) commsSync.textContent = `${appState.player.syncRate}%`;
+      if (waterDisplay) waterDisplay.textContent = appState.waterIntakeToday;
+
+      renderTrainingCards();
+      renderMealPresets();
+      renderFoodChips();
+      renderDividendsList();
+      renderDailyMissions();
+      renderAchievements();
+      renderRadarChart();
+      checkGlobalDecayAlerts();
+    }
+
+    window.onload = async function() {
+      try {
+        initAppState();
+        renderAll();
+        await getStoredMasterTemplateImage();
+        appendCommsMessage('operator', 'VALKYRIE-OS 正常起動。全6ステータス同期完了。本日の鍛錬および食事報告をお待ちしています。');
+        setInterval(updateJstCountdown, 1000);
+        updateJstCountdown();
+      } catch (err) {
+        console.error('App initialization error:', err);
+      }
+    };
+
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeVideoModal();
+        closeHudImageModal();
+        closeSortieModal();
+        closeCelebrationModal();
+        closeBackupModal();
+        closePresetEditorModal();
+      }
+    });
+  </script>
+</body>
+</html>
